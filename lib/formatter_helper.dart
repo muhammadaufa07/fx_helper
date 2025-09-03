@@ -29,6 +29,14 @@ class FormatterHelper {
     return DateFormat('E, dd MMM yyyy').format(dateTime);
   }
 
+  static String formatDateDDMMMYYYYHHMM(String date) {
+    var dateTime = DateTime.tryParse(date);
+    if (dateTime == null) {
+      return "";
+    }
+    return DateFormat('dd MMM yyyy HH:mm:ss').format(dateTime);
+  }
+
   // static String getHeaderFormattedDate() => "${DateFormat('E, dd MMM yyyy HH:mm:ss').format(DateTime.now())} +0700";
   // String formatDateDDMMMYYYY(String date) {
   //   var dateTime = DateTime.tryParse(date);
@@ -36,14 +44,6 @@ class FormatterHelper {
   //     return "";
   //   }
   //   return "${DateFormat('dd MMM yyyy').format(dateTime)} +0700";
-  // }
-
-  // static String formatDateDDMMMYYYYHHMM(String date) {
-  //   var dateTime = DateTime.tryParse(date);
-  //   if (dateTime == null) {
-  //     return "";
-  //   }
-  //   return DateFormat('dd MMM yyyy HH:mm:ss').format(dateTime);
   // }
 
   // static String formatDateYYYYMMdd(String date) {
