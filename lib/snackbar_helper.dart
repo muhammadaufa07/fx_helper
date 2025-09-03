@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-final GlobalKey<ScaffoldMessengerState> snackbarKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> globalSnackbarKey = GlobalKey<ScaffoldMessengerState>();
 
 enum SnackbarState { success, error, warning }
 
@@ -58,6 +58,6 @@ class SnackbarHelper {
         ],
       ),
     );
-    snackbarKey.currentState?.showSnackBar(snackBar);
+    globalSnackbarKey.currentState?.showSnackBar(snackBar);
   }
 }
