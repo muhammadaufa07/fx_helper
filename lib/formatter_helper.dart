@@ -125,40 +125,40 @@ class FormatterHelper {
   //   }
   // }
 
-  // static TextInputFormatter get currencyInputFormatter => TextInputFormatter.withFunction((oldValue, newValue) {
-  //   if (newValue.text.isEmpty) {
-  //     return TextEditingValue(text: '', selection: TextSelection.collapsed(offset: 0));
-  //   }
+  static TextInputFormatter get currencyInputFormatter => TextInputFormatter.withFunction((oldValue, newValue) {
+    if (newValue.text.isEmpty) {
+      return TextEditingValue(text: '', selection: TextSelection.collapsed(offset: 0));
+    }
 
-  //   // Hapus semua karakter kecuali angka
-  //   String cleanValue = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    // Hapus semua karakter kecuali angka
+    String cleanValue = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
 
-  //   if (cleanValue.isEmpty) {
-  //     return TextEditingValue(text: '', selection: TextSelection.collapsed(offset: 0));
-  //   }
+    if (cleanValue.isEmpty) {
+      return TextEditingValue(text: '', selection: TextSelection.collapsed(offset: 0));
+    }
 
-  //   // Konversi ke angka
-  //   double value = double.parse(cleanValue);
+    // Konversi ke angka
+    double value = double.parse(cleanValue);
 
-  //   // Format ulang angka menjadi Rupiah
-  //   String formattedText = NumberFormat.currency(locale: "id_ID", symbol: "Rp", decimalDigits: 0).format(value);
+    // Format ulang angka menjadi Rupiah
+    String formattedText = NumberFormat.currency(locale: "id_ID", symbol: "Rp", decimalDigits: 0).format(value);
 
-  //   // Hitung perbedaan panjang sebelum dan sesudah format
-  //   int newCursorPosition = formattedText.length - (cleanValue.length - newValue.selection.baseOffset);
+    // Hitung perbedaan panjang sebelum dan sesudah format
+    int newCursorPosition = formattedText.length - (cleanValue.length - newValue.selection.baseOffset);
 
-  //   // Pastikan posisi kursor tetap dalam batas teks
-  //   newCursorPosition = newCursorPosition.clamp(0, formattedText.length);
+    // Pastikan posisi kursor tetap dalam batas teks
+    newCursorPosition = newCursorPosition.clamp(0, formattedText.length);
 
-  //   return TextEditingValue(
-  //     text: formattedText,
-  //     selection: TextSelection.collapsed(offset: newCursorPosition),
-  //   );
-  // });
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: newCursorPosition),
+    );
+  });
 
-  // static int parseCurrency(String formattedText) {
-  //   String cleanedText = formattedText.replaceAll(RegExp(r'[^0-9]'), '');
-  //   return int.tryParse(cleanedText) ?? 0;
-  // }
+  static int parseCurrency(String formattedText) {
+    String cleanedText = formattedText.replaceAll(RegExp(r'[^0-9]'), '');
+    return int.tryParse(cleanedText) ?? 0;
+  }
 
   // static String getMonthName(int monthNumber) {
   //   List<String> monthNames = [
