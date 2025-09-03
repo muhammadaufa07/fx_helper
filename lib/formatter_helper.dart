@@ -26,7 +26,7 @@ class FormatterHelper {
     if (dateTime == null) {
       return "";
     }
-    return DateFormat('E, dd MMM yyyy').format(dateTime);
+    return DateFormat('E, dd MMM yyyy', 'id').format(dateTime);
   }
 
   static String formatDateDDMMMYYYYHHMM(String date) {
@@ -42,7 +42,7 @@ class FormatterHelper {
     if (dateTime == null) {
       return "";
     }
-    return DateFormat('EEEE, d MMMM y').format(dateTime);
+    return DateFormat('EEEE, d MMMM y', 'id').format(dateTime);
   }
 
   static String formatDateEEEEddMMMMyyyy(String date) {
@@ -50,7 +50,7 @@ class FormatterHelper {
     if (dateTime == null) {
       return "";
     }
-    return DateFormat('EEEE, dd MMMM yyyy').format(dateTime);
+    return DateFormat('EEEE, dd MMMM yyyy', 'id').format(dateTime);
   }
 
   static String formatDateToTimeHHMMss(String date) {
