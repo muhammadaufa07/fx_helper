@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class FormatterHelper {
+  static final String _errorMessage = "Date Error";
   static String formatRp(int price) {
     var formatter = NumberFormat('###,###', 'id');
     return "Rp ${formatter.format((price))}";
@@ -13,64 +14,51 @@ class FormatterHelper {
     return "Rp ${formatter.format((price))}";
   }
 
-  static String formatDatedMy(String date) {
-    var dateTime = DateTime.tryParse(date);
+  static String formatDatedMy(DateTime? dateTime) {
     if (dateTime == null) {
-      return "";
+      return _errorMessage;
     }
     return DateFormat(('d-M-yyyy')).format(dateTime);
   }
 
-  static String formateDateEEEDDMMMYYYY(String date) {
-    var dateTime = DateTime.tryParse(date);
+  static String formateDateEEEDDMMMYYYY(DateTime? dateTime) {
     if (dateTime == null) {
-      return "";
+      return "Date Error";
     }
     return DateFormat('E, dd MMM yyyy', 'id').format(dateTime);
   }
 
-  static String formatDateDDMMMYYYYHHMM(String date) {
-    var dateTime = DateTime.tryParse(date);
+  static String formatDateDDMMMYYYYHHMM(DateTime? dateTime) {
     if (dateTime == null) {
-      return "";
+      return "Date Error";
     }
     return DateFormat('dd MMM yyyy HH:mm:ss').format(dateTime);
   }
 
-  static String formatDateEEEEdMMMy(String date) {
-    var dateTime = DateTime.tryParse(date);
+  static String formatDateEEEEdMMMy(DateTime? dateTime) {
     if (dateTime == null) {
-      return "";
+      return "Date Error";
     }
     return DateFormat('EEEE, d MMMM y', 'id').format(dateTime);
   }
 
-  static String formatDateEEEEddMMMMyyyy(String date) {
-    var dateTime = DateTime.tryParse(date);
+  static String formatDateEEEEddMMMMyyyy(DateTime? dateTime) {
     if (dateTime == null) {
-      return "";
+      return "Date Error";
     }
     return DateFormat('EEEE, dd MMMM yyyy', 'id').format(dateTime);
   }
 
-  static String formatDateToTimeHHMMss(String date) {
-    if (date == "") {
-      return "";
-    }
-    var dateTime = DateTime.tryParse(date);
+  static String formatDateToTimeHHMMss(DateTime? dateTime) {
     if (dateTime == null) {
-      return "";
+      return "Date Error";
     }
     return DateFormat('HH:mm:ss').format(dateTime);
   }
 
-  static String formatDateToTimeHHmm(String date) {
-    if (date == "") {
-      return "";
-    }
-    var dateTime = DateTime.tryParse(date);
+  static String formatDateToTimeHHmm(DateTime? dateTime) {
     if (dateTime == null) {
-      return "";
+      return "Date Error";
     }
     return DateFormat('HH:mm').format(dateTime);
   }
