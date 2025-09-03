@@ -37,6 +37,44 @@ class FormatterHelper {
     return DateFormat('dd MMM yyyy HH:mm:ss').format(dateTime);
   }
 
+  static String formatDateEEEEdMMMy(String date) {
+    var dateTime = DateTime.tryParse(date);
+    if (dateTime == null) {
+      return "";
+    }
+    return DateFormat('EEEE, d MMMM y').format(dateTime);
+  }
+
+  static String formatDateEEEEddMMMMyyyy(String date) {
+    var dateTime = DateTime.tryParse(date);
+    if (dateTime == null) {
+      return "";
+    }
+    return DateFormat('EEEE, dd MMMM yyyy').format(dateTime);
+  }
+
+  static String formatDateToTimeHHMMss(String date) {
+    if (date == "") {
+      return "";
+    }
+    var dateTime = DateTime.tryParse(date);
+    if (dateTime == null) {
+      return "";
+    }
+    return DateFormat('HH:mm:ss').format(dateTime);
+  }
+
+  static String formatDateToTimeHHmm(String date) {
+    if (date == "") {
+      return "";
+    }
+    var dateTime = DateTime.tryParse(date);
+    if (dateTime == null) {
+      return "";
+    }
+    return DateFormat('HH:mm').format(dateTime);
+  }
+
   // static String getHeaderFormattedDate() => "${DateFormat('E, dd MMM yyyy HH:mm:ss').format(DateTime.now())} +0700";
   // String formatDateDDMMMYYYY(String date) {
   //   var dateTime = DateTime.tryParse(date);
@@ -52,17 +90,6 @@ class FormatterHelper {
   //     return "";
   //   }
   //   return DateFormat(('yyyy-MM-dd')).format(dateTime);
-  // }
-
-  // static String formatDateToTimeHHMMSS(String date) {
-  //   if (date == "") {
-  //     return "";
-  //   }
-  //   var dateTime = DateTime.tryParse(date);
-  //   if (dateTime == null) {
-  //     return "";
-  //   }
-  //   return DateFormat('HH:mm:ss').format(dateTime);
   // }
 
   // static String formateDateDayMonthYear(String date) {
