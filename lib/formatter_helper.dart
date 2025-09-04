@@ -71,10 +71,9 @@ class FormatterHelper {
   //   return "${DateFormat('dd MMM yyyy').format(dateTime)} +0700";
   // }
 
-  static String formatDateYYYYMMdd(String date) {
-    var dateTime = DateTime.tryParse(date);
+  static String formatDateYYYYMMdd(DateTime? dateTime) {
     if (dateTime == null) {
-      return "";
+      return "Date Error";
     }
     return DateFormat(('yyyy-MM-dd')).format(dateTime);
   }
