@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -6,12 +5,12 @@ class FormatterHelper {
   static final String _errorMessage = "Date Error";
   static String formatRp(int price) {
     var formatter = NumberFormat('###,###', 'id');
-    return "Rp ${formatter.format((price))}";
+    return "Rp${formatter.format((price))}";
   }
 
   static String formatRpDouble(double price) {
     var formatter = NumberFormat('###,###', 'id');
-    return "Rp ${formatter.format((price))}";
+    return "Rp${formatter.format((price))}";
   }
 
   static String formatDatedMy(DateTime? dateTime) {
