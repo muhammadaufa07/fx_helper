@@ -9,7 +9,17 @@ class ImageNetworkApi extends StatelessWidget {
   final double? height;
   final Color? backgroundColor;
   final Map<String, String>? headers;
-  const ImageNetworkApi(this.url, {super.key, this.fit, this.width, this.height, this.backgroundColor, this.headers});
+  final Widget Function(BuildContext, String, Object?)? errorBuilder;
+  const ImageNetworkApi(
+    this.url, {
+    super.key,
+    this.fit,
+    this.width,
+    this.height,
+    this.backgroundColor,
+    this.headers,
+    this.errorBuilder,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +44,12 @@ class ImageNetworkApi extends StatelessWidget {
           ],
         );
       },
-      errorWidget: (context, url, error) => _noImageIcon(),
+
+      errorWidget:
+          errorBuilder ??
+          (context, url, error) {
+            return _noImageIcon();
+          },
     );
   }
 
