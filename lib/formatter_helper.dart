@@ -71,13 +71,13 @@ class FormatterHelper {
   //   return "${DateFormat('dd MMM yyyy').format(dateTime)} +0700";
   // }
 
-  // static String formatDateYYYYMMdd(String date) {
-  //   var dateTime = DateTime.tryParse(date);
-  //   if (dateTime == null) {
-  //     return "";
-  //   }
-  //   return DateFormat(('yyyy-MM-dd')).format(dateTime);
-  // }
+  static String formatDateYYYYMMdd(String date) {
+    var dateTime = DateTime.tryParse(date);
+    if (dateTime == null) {
+      return "";
+    }
+    return DateFormat(('yyyy-MM-dd')).format(dateTime);
+  }
 
   // static String formateDateDayMonthYear(String date) {
   //   if (date.isEmpty) {
