@@ -23,6 +23,9 @@ class ImageNetworkApi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (url.isEmpty) {
+      return _noImageIcon();
+    }
     return CachedNetworkImage(
       imageUrl: url,
       placeholder: (context, url) {
