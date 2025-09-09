@@ -43,7 +43,9 @@ class SnackbarHelper {
       content: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(message, style: TextStyle(color: _getTextColor(state))),
+          Expanded(
+            child: Text(message, style: TextStyle(color: _getTextColor(state))),
+          ),
           showButton
               ? ElevatedButton(
                   onPressed: onTap,
