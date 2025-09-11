@@ -1,7 +1,7 @@
 name: fx_helper
 description: "A new Flutter package project."
 version: 0.0.1
-homepage:
+homepage: "https://github.com/muhammadaufa07/fx_helper"
 
 environment:
   sdk: ^3.8.1
@@ -23,8 +23,12 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
-flutter:
-
+flutter: 
+  assets:
+    - assets/icons/
+    - assets/images/
+    - assets/lotties/
+    - assets/backgrounds/
   # To add assets to your package, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
