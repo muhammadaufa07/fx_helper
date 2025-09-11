@@ -65,6 +65,8 @@ class ImageNetworkApi extends StatelessWidget {
   }
 
   Widget _noImageIcon() {
-    return FittedBox(child: Image.asset("assets/images/img_no_image.png", fit: BoxFit.cover));
+    return FittedBox(
+      child: Image.asset("assets/images/img_no_image.png", fit: BoxFit.cover, package: 'fx_helper'),
+    );
   }
 }
