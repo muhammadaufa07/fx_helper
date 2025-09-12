@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ImageNetworkApi extends StatelessWidget {
-  final String url;
+  final String? url;
   final BoxFit? fit;
   final double? width;
   final double? height;
@@ -23,11 +23,11 @@ class ImageNetworkApi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (url.isEmpty) {
+    if (url == null || url?.isEmpty == true) {
       return _noImageIcon();
     }
     return CachedNetworkImage(
-      imageUrl: url,
+      imageUrl: url ?? "",
       placeholder: (context, url) {
         return _shimmer(width ?? 0, width ?? 0);
       },
