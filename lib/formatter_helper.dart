@@ -151,27 +151,27 @@ class FormatterHelper {
     return DateFormat('dd MMM yyyy').format(dateTime);
   }
 
-  // static TextEditingValue formatTextEditingValue(String text, TextEditingValue oldValue) {
-  //   if (text.isEmpty) return oldValue.copyWith(text: '');
+  static TextEditingValue formatTextEditingValue(String text, TextEditingValue oldValue) {
+    if (text.isEmpty) return oldValue.copyWith(text: '');
 
-  //   try {
-  //     // Remove non-numeric characters for parsing
-  //     String cleanedText = text.replaceAll(RegExp(r'[^0-9]'), '');
+    try {
+      // Remove non-numeric characters for parsing
+      String cleanedText = text.replaceAll(RegExp(r'[^0-9]'), '');
 
-  //     // Parse to integer and reformat
-  //     int value = int.parse(cleanedText);
-  //     String formatted = formatRp(value);
+      // Parse to integer and reformat
+      int value = int.parse(cleanedText);
+      String formatted = formatRp(value);
 
-  //     // Calculate new caret position
-  //     int newCursorPosition = formatted.length - (text.length - oldValue.selection.end);
-  //     return TextEditingValue(
-  //       text: formatted,
-  //       selection: TextSelection.collapsed(offset: newCursorPosition),
-  //     );
-  //   } catch (e) {
-  //     return oldValue; // Return old value if parsing fails
-  //   }
-  // }
+      // Calculate new caret position
+      int newCursorPosition = formatted.length - (text.length - oldValue.selection.end);
+      return TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: newCursorPosition),
+      );
+    } catch (e) {
+      return oldValue; // Return old value if parsing fails
+    }
+  }
 
   /// A custom [TextInputFormatter] for currency input in Indonesian Rupiah format.
   ///
