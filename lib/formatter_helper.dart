@@ -225,24 +225,24 @@ class FormatterHelper {
     return int.tryParse(cleanedText) ?? 0;
   }
 
-  // static String getMonthName(int monthNumber) {
-  //   List<String> monthNames = [
-  //     '', // index ke-0 dikosongkan biar index 1 = Januari
-  //     'Januari',
-  //     'Februari',
-  //     'Maret',
-  //     'April',
-  //     'Mei',
-  //     'Juni',
-  //     'Juli',
-  //     'Agustus',
-  //     'September',
-  //     'Oktober',
-  //     'November',
-  //     'Desember',
-  //   ];
+  static String getMonthName(int monthNumber) {
+    List<String> monthNames = [
+      '', // index ke-0 dikosongkan biar index 1 = Januari
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
 
-  //   if (monthNumber < 1 || monthNumber > 12) return 'Bulan tidak valid';
-  //   return monthNames[monthNumber];
-  // }
+    if (monthNumber < 1 || monthNumber > 12) return 'Bulan tidak valid';
+    return monthNames[monthNumber];
+  }
 }
