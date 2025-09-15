@@ -144,16 +144,12 @@ class FormatterHelper {
     return DateFormat(('yyyy-MM-dd')).format(dateTime);
   }
 
-  // static String formateDateDayMonthYear(String date) {
-  //   if (date.isEmpty) {
-  //     return "";
-  //   }
-  //   var dateTime = DateTime.tryParse(date);
-  //   if (dateTime == null) {
-  //     return "";
-  //   }
-  //   return DateFormat('dd MMM yyyy').format(dateTime);
-  // }
+  static String formateDateDayMonthYear(DateTime? dateTime) {
+    if (dateTime == null) {
+      return "Date Error";
+    }
+    return DateFormat('dd MMM yyyy').format(dateTime);
+  }
 
   // static TextEditingValue formatTextEditingValue(String text, TextEditingValue oldValue) {
   //   if (text.isEmpty) return oldValue.copyWith(text: '');
