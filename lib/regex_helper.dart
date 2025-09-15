@@ -1,24 +1,61 @@
 class RegexpHelper {
+  /// Validates if a string is a valid email address.
+  ///
+  /// Example:
+  /// ```dart
+  /// RegexpHelper.isEmail("test@example.com"); // true
+  /// RegexpHelper.isEmail("invalid_email"); // false
+  /// ```
   static bool isEmail(String email) {
-    // String regex =
-    // r"^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$";
     String regex = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
     RegExp regExp = RegExp(regex);
     return regExp.hasMatch(email);
   }
 
+  /// Validates if a string is a valid Indonesian phone number format.
+  ///
+  /// The format must:
+  /// - Start with `8`
+  /// - Contain 9–16 digits total (including the first `8`)
+  ///
+  /// Example:
+  /// ```dart
+  /// RegexpHelper.isPhoneNumber("8123456789"); // true
+  /// RegexpHelper.isPhoneNumber("712345678");  // false
+  /// ```
   static bool isPhoneNumber(String phoneNumber) {
     String regex = r'^8[\d]{8,15}$';
     RegExp regExp = RegExp(regex);
     return regExp.hasMatch(phoneNumber);
   }
 
+  /// Validates if a string is a valid NPWP (Indonesian Tax ID).
+  ///
+  /// The format must be: `99.999.999.9-999.999`
+  ///
+  /// Example:
+  /// ```dart
+  /// RegexpHelper.isNPWP("12.345.678.9-012.345"); // true
+  /// RegexpHelper.isNPWP("123456789012345");      // false
+  /// ```
   static bool isNPWP(String npwp) {
     String regex = r'^\d{2}\.\d{3}\.\d{3}\.\d{1}-\d{3}\.\d{3}$';
     RegExp regExp = RegExp(regex);
     return regExp.hasMatch(npwp);
   }
 
+  /// Validates if a password meets the following rules:
+  /// - At least 1 uppercase letter
+  /// - At least 1 lowercase letter
+  /// - At least 1 digit
+  /// - At least 1 special character (`!@#$&`)
+  /// - Minimum length of 8 characters
+  ///
+  /// Example:
+  /// ```dart
+  /// RegexpHelper.isPassword("Password1!"); // true
+  /// RegexpHelper.isPassword("password");   // false
+  /// ```
   static bool isPassword(String password) {
     RegExp hasUppercase = RegExp(r'(?=.*[A-Z])');
     RegExp hasLowercase = RegExp(r'(?=.*[a-z])');
@@ -33,6 +70,23 @@ class RegexpHelper {
         hasMinLength.hasMatch(password);
   }
 
+  /// Returns a warning message for a password if it does not meet the requirements.
+  ///
+  /// The warning message is in **Indonesian**, listing what is missing:
+  /// - `1 huruf besar.` → missing uppercase letter
+  /// - `1 huruf kecil.` → missing lowercase letter
+  /// - `1 angka.` → missing digit
+  /// - `1 special character (!@#$&).` → missing special character
+  /// - `8 karakter.` → password too short
+  ///
+  /// Example:
+  /// ```dart
+  /// RegexpHelper.getPasswordWarning("pass");
+  /// // "- 1 huruf besar.\n- 1 angka.\n- 1 special character (!@#$&).\n- 8 karakter.\n"
+  ///
+  /// RegexpHelper.getPasswordWarning("Password1!");
+  /// // ""
+  /// ```
   static String getPasswordWarning(String password) {
     String warning = '';
 

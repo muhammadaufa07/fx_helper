@@ -1,10 +1,36 @@
 import 'package:flutter/material.dart';
 
+/// A global key for showing SnackBars across the entire app
+/// using [SnackbarHelper.showSnackBar].
+///
+/// Example:
+/// ```dart
+/// MaterialApp(
+///   scaffoldMessengerKey: globalSnackbarKey,
+///   home: MyHomePage(),
+/// )
+/// ```
 final GlobalKey<ScaffoldMessengerState> globalSnackbarKey = GlobalKey<ScaffoldMessengerState>();
 
+/// Different types of snackbar states that define color and style.
 enum SnackbarState { success, error, warning }
 
+/// A helper class for showing custom styled SnackBars.
+///
+/// Example:
+/// ```dart
+/// SnackbarHelper.showSnackBar(
+///   SnackbarState.success,
+///   "Data saved successfully!",
+/// );
+/// ```
 class SnackbarHelper {
+  /// Returns the text color for the snackbar based on its [SnackbarState].
+  ///
+  /// Example:
+  /// ```dart
+  /// Color? textColor = SnackbarHelper._getTextColor(SnackbarState.error); // Colors.white
+  /// ```
   static Color? _getTextColor(SnackbarState state) {
     switch (state) {
       case SnackbarState.success:
@@ -16,6 +42,12 @@ class SnackbarHelper {
     }
   }
 
+  /// Returns the background color for the snackbar based on its [SnackbarState].
+  ///
+  /// Example:
+  /// ```dart
+  /// Color? bg = SnackbarHelper._getbackground(SnackbarState.error); // Colors.red
+  /// ```
   static Color? _getbackground(SnackbarState state) {
     switch (state) {
       case SnackbarState.success:
@@ -27,6 +59,29 @@ class SnackbarHelper {
     }
   }
 
+  /// Shows a Snackbar with custom styles depending on [SnackbarState].
+  ///
+  /// Parameters:
+  /// - [state]: Defines the snackbar type (`success`, `error`, `warning`).
+  /// - [message]: The message to display.
+  /// - [showButton]: Whether to show an action button (default: `false`).
+  /// - [buttonTitle]: The label of the action button (default: `"Close"`).
+  /// - [onTap]: Callback when the button is tapped.
+  /// - [duration]: How long the snackbar is displayed (default: 2 seconds).
+  ///
+  /// Example:
+  /// ```dart
+  /// SnackbarHelper.showSnackBar(
+  ///   SnackbarState.success,
+  ///   "Profile updated successfully!",
+  ///   showButton: true,
+  ///   buttonTitle: "Undo",
+  ///   onTap: () {
+  ///     print("Undo tapped");
+  ///   },
+  ///   duration: Duration(seconds: 3),
+  /// );
+  /// ```
   static void showSnackBar(
     SnackbarState state,
     String message, {

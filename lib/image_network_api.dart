@@ -29,6 +29,7 @@ class ImageNetworkApi extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: url ?? "",
       placeholder: (context, url) {
+        /// show shimmer when image not ready
         return _shimmer(width ?? 0, width ?? 0);
       },
       httpHeaders: headers,
@@ -48,6 +49,7 @@ class ImageNetworkApi extends StatelessWidget {
         );
       },
 
+      /// show no image icon when error
       errorWidget:
           errorBuilder ??
           (context, url, error) {
