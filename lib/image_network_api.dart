@@ -10,6 +10,7 @@ class ImageNetworkApi extends StatelessWidget {
   final Color? backgroundColor;
   final Map<String, String>? headers;
   final Widget Function(BuildContext, String, Object?)? errorBuilder;
+  final Widget Function(BuildContext context, String url)? loadingBuilder;
   const ImageNetworkApi(
     this.url, {
     super.key,
@@ -19,6 +20,7 @@ class ImageNetworkApi extends StatelessWidget {
     this.backgroundColor,
     this.headers,
     this.errorBuilder,
+    this.loadingBuilder,
   });
 
   @override
@@ -31,10 +33,12 @@ class ImageNetworkApi extends StatelessWidget {
 
       width: width,
       height: height,
-      placeholder: (context, url) {
-        /// show shimmer when image not ready
-        return _shimmer(width ?? 0, width ?? 0);
-      },
+      placeholder:
+          loadingBuilder ??
+          (context, url) {
+            /// show shimmer when image not ready
+            return _shimmer(width ?? 0, width ?? 0);
+          },
       httpHeaders: headers,
       imageBuilder: (context, imageProvider) {
         return LayoutBuilder(
