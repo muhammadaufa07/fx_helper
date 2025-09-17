@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ImageNetworkApi2 extends StatelessWidget {
-  String? url;
-  BoxFit? fit;
+  final String? url;
+  final BoxFit? fit;
   final double? width;
   final double? height;
   final Color? backgroundColor;
   final Map<String, String>? headers;
   final Widget Function(BuildContext, String, Object?)? errorBuilder;
-  ImageNetworkApi2(
+  const ImageNetworkApi2(
     this.url, {
     super.key,
     this.fit,
