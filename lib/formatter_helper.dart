@@ -225,9 +225,15 @@ class FormatterHelper {
     return int.tryParse(cleanedText) ?? 0;
   }
 
+  /// Get the name of a month based on its number.
+  ///
+  /// Example:
+  /// ```dart
+  /// FormatterHelper.getMonthName(1); // "Januari"
+  /// ```
   static String getMonthName(int monthNumber) {
     List<String> monthNames = [
-      '', // index ke-0 dikosongkan biar index 1 = Januari
+      '', // index 0 is not used, so index 1 is Januari
       'Januari',
       'Februari',
       'Maret',
