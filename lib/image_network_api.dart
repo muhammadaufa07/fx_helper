@@ -37,11 +37,7 @@ class ImageNetworkApi extends StatelessWidget {
       },
       httpHeaders: headers,
       imageBuilder: (context, imageProvider) {
-        return Container(
-          color: Colors.green,
-          width: 200,
-          height: 200,
-        )
+        return Container(color: Colors.green, width: 200, height: 200);
         return Container(
           width: width,
           height: height,
