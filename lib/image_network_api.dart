@@ -27,6 +27,9 @@ class ImageNetworkApi extends StatelessWidget {
       return _noImageIcon();
     }
     return CachedNetworkImage(
+      color: Colors.amber,
+      width: width,
+      height: height,
       imageUrl: url ?? "",
       placeholder: (context, url) {
         /// show shimmer when image not ready
@@ -34,18 +37,12 @@ class ImageNetworkApi extends StatelessWidget {
       },
       httpHeaders: headers,
       imageBuilder: (context, imageProvider) {
-        return Row(
-          children: [
-            Expanded(
-              child: Container(
-                width: width,
-                height: height,
-                decoration: BoxDecoration(
-                  image: DecorationImage(image: imageProvider, fit: fit),
-                ),
-              ),
-            ),
-          ],
+        return Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            image: DecorationImage(image: imageProvider, fit: fit),
+          ),
         );
       },
 
