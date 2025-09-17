@@ -2,15 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-class ImageNetworkApi extends StatelessWidget {
-  final String? url;
-  final BoxFit? fit;
+class ImageNetworkApi2 extends StatelessWidget {
+  String? url;
+  BoxFit? fit;
   final double? width;
   final double? height;
   final Color? backgroundColor;
   final Map<String, String>? headers;
   final Widget Function(BuildContext, String, Object?)? errorBuilder;
-  const ImageNetworkApi(
+  ImageNetworkApi2(
     this.url, {
     super.key,
     this.fit,
@@ -28,18 +28,24 @@ class ImageNetworkApi extends StatelessWidget {
     }
     return CachedNetworkImage(
       imageUrl: url ?? "",
+
+      width: width,
+      height: height,
       placeholder: (context, url) {
         /// show shimmer when image not ready
         return _shimmer(width ?? 0, width ?? 0);
       },
       httpHeaders: headers,
       imageBuilder: (context, imageProvider) {
-        return Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            image: DecorationImage(image: imageProvider, fit: fit),
-          ),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return Container(
+              height: height ?? (constraints.hasBoundedHeight ? constraints.biggest.height : constraints.biggest.width),
+              decoration: BoxDecoration(
+                image: DecorationImage(image: imageProvider, fit: fit),
+              ),
+            );
+          },
         );
       },
 
