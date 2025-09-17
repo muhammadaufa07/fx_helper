@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-class ImageNetworkApi2 extends StatelessWidget {
+class ImageNetworkApi extends StatelessWidget {
   final String? url;
   final BoxFit? fit;
   final double? width;
@@ -10,7 +10,7 @@ class ImageNetworkApi2 extends StatelessWidget {
   final Color? backgroundColor;
   final Map<String, String>? headers;
   final Widget Function(BuildContext, String, Object?)? errorBuilder;
-  const ImageNetworkApi2(
+  const ImageNetworkApi(
     this.url, {
     super.key,
     this.fit,
