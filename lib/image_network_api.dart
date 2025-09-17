@@ -24,7 +24,7 @@ class ImageNetworkApi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (url == null || url?.isEmpty == true) {
-      return SizedBox(width: width, height: height, child: _noImageIcon());
+      return _noImageIcon();
     }
     return CachedNetworkImage(
       imageUrl: url ?? "",
@@ -67,7 +67,9 @@ class ImageNetworkApi extends StatelessWidget {
   }
 
   Widget _noImageIcon() {
-    return FittedBox(
+    return SizedBox(
+      width: width,
+      height: height,
       child: Image.asset("assets/images/img_no_image.png", fit: BoxFit.cover, package: 'fx_helper'),
     );
   }
