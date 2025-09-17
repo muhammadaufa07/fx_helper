@@ -42,7 +42,7 @@ class ImageNetworkApi extends StatelessWidget {
             return Container(
               height: height ?? (constraints.hasBoundedHeight ? constraints.biggest.height : constraints.biggest.width),
               decoration: BoxDecoration(
-                image: DecorationImage(image: imageProvider, fit: fit),
+                image: DecorationImage(image: imageProvider, fit: fit ?? BoxFit.cover),
               ),
             );
           },
