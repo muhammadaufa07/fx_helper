@@ -24,7 +24,7 @@ class ImageNetworkApi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (url == null || url?.isEmpty == true) {
-      return _noImageIcon();
+      return SizedBox(width: width, height: height, child: _noImageIcon());
     }
     return CachedNetworkImage(
       imageUrl: url ?? "",
