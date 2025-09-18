@@ -42,3 +42,26 @@ class ShimmerRectangle extends StatelessWidget {
         : child;
   }
 }
+
+class ShimmerWidget extends StatelessWidget {
+  final double width;
+  final double height;
+  final double radius;
+  // final ShapeBorder shapeBorder;
+
+  const ShimmerWidget.rectangular({super.key, this.width = double.infinity, required this.height, this.radius = 12});
+
+  const ShimmerWidget.circular({super.key, this.width = double.infinity, required this.height, this.radius = 1000});
+
+  @override
+  Widget build(BuildContext context) => Shimmer.fromColors(
+    baseColor: const Color(0xFFBEBEBE),
+    highlightColor: Colors.grey[300]!,
+    period: Duration(seconds: 2),
+    child: Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(color: Colors.grey[400]!, borderRadius: BorderRadius.circular(radius)),
+    ),
+  );
+}
