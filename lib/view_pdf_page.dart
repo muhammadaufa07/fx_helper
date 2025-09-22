@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
@@ -10,52 +11,52 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 class ViewPdfPage extends StatefulWidget {
   final String title;
   final String? url;
-  final String? publicUrl;
+  final String? localFile;
   final Map<String, String>? headers;
 
-  const ViewPdfPage({super.key, required this.title, this.url, this.publicUrl, this.headers});
+  const ViewPdfPage({super.key, required this.title, this.url, this.headers, this.localFile});
   @override
   _ViewPdfPageState createState() => _ViewPdfPageState();
 }
 
 class _ViewPdfPageState extends State<ViewPdfPage> {
-  Map<String, String>? headers = {};
+  // Map<String, String>? headers = {};
   bool isLoading = false;
-  String? pdfUrl;
-  String? urlHolder;
+  // String? pdfUrl;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      loadPdf();
+      // loadPdf();
     });
 
     super.initState();
   }
 
-  Future<void> loadPdf() async {
-    setState(() {
-      isLoading = true;
-    });
+  // Future<void> loadPdf() async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
 
-    try {
-      if (widget.url != null) {
-        headers = widget.headers;
+  //   try {
+  //     if (widget.url != null) {
+  //       // headers = widget.headers;
 
-        var url = widget.url;
-        // var response = await Network.get(Net.gateway, widget.url ?? '');
-        // if (response.statusCode == 200) {
-        pdfUrl = url;
-        // } else {}
-      } else {
-        pdfUrl = widget.publicUrl ?? '';
-      }
-      setState(() {});
-    } catch (e) {}
+  //       var url = widget.url;
+  //       // var response = await Network.get(Net.gateway, widget.url ?? '');
+  //       // if (response.statusCode == 200) {
+  //       pdfUrl = url;
+  //       // } else {}
+  //     }
+  //     //  else {
+  //     //   pdfUrl = widget.publicUrl ?? '';
+  //     // }
+  //     setState(() {});
+  //   } catch (e) {}
 
-    setState(() {
-      isLoading = false;
-    });
-  }
+  //   setState(() {
+  //     isLoading = false;
+  //   });
+  // }
 
   Future<void> printPdfFromUrl(String url) async {
     try {
@@ -127,7 +128,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
           child: Icon(Icons.download, color: Colors.white),
         ),
         onPressed: () {
-          printPdfFromUrl(pdfUrl!);
+          printPdfFromUrl(widget.url ?? '');
         },
       ),
       body: Builder(
@@ -136,15 +137,19 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
             return Center(child: CircularProgressIndicator(color: const Color(0xFFAC1F1F)));
           }
 
-          if ((pdfUrl ?? '').isEmpty) {
+          if ((widget.url ?? '').isEmpty) {
             return Center(
               child: Text("Gagal memuat PDF", style: TextStyle(color: Colors.red)),
             );
           }
 
+          if (widget.localFile != null) {
+            return SfPdfViewer.file(File(widget.localFile!));
+          }
+
           return SfPdfViewerTheme(
             data: SfPdfViewerThemeData(backgroundColor: Colors.white, progressBarColor: const Color(0xFFAC1F1F)),
-            child: SfPdfViewer.network(pdfUrl!, headers: headers),
+            child: SfPdfViewer.network(widget.url ?? '', headers: widget.headers),
           );
         },
       ),
