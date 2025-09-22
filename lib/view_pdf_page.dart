@@ -22,7 +22,7 @@ class ViewPdfPage extends StatefulWidget {
 class _ViewPdfPageState extends State<ViewPdfPage> {
   // Map<String, String>? headers = {};
   bool isLoading = false;
-  // String? pdfUrl;
+  String? pdfUrl;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -32,31 +32,31 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
     super.initState();
   }
 
-  // Future<void> loadPdf() async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
+  Future<void> loadPdf() async {
+    setState(() {
+      isLoading = true;
+    });
 
-  //   try {
-  //     if (widget.url != null) {
-  //       // headers = widget.headers;
+    try {
+      if (widget.url != null) {
+        // headers = widget.headers;
 
-  //       var url = widget.url;
-  //       // var response = await Network.get(Net.gateway, widget.url ?? '');
-  //       // if (response.statusCode == 200) {
-  //       pdfUrl = url;
-  //       // } else {}
-  //     }
-  //     //  else {
-  //     //   pdfUrl = widget.publicUrl ?? '';
-  //     // }
-  //     setState(() {});
-  //   } catch (e) {}
+        var url = widget.url;
+        // var response = await Network.get(Net.gateway, widget.url ?? '');
+        // if (response.statusCode == 200) {
+        pdfUrl = url;
+        // } else {}
+      }
+      //  else {
+      //   pdfUrl = widget.publicUrl ?? '';
+      // }
+      setState(() {});
+    } catch (e) {}
 
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  // }
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   Future<void> printPdfFromUrl(String url) async {
     try {
@@ -137,7 +137,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
             return Center(child: CircularProgressIndicator(color: const Color(0xFFAC1F1F)));
           }
 
-          if ((widget.url ?? '').isEmpty) {
+          if ((pdfUrl ?? '').isEmpty) {
             return Center(
               child: Text("Gagal memuat PDF", style: TextStyle(color: Colors.red)),
             );
@@ -149,7 +149,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
 
           return SfPdfViewerTheme(
             data: SfPdfViewerThemeData(backgroundColor: Colors.white, progressBarColor: const Color(0xFFAC1F1F)),
-            child: SfPdfViewer.network(widget.url ?? '', headers: widget.headers),
+            child: SfPdfViewer.network(pdfUrl ?? '', headers: widget.headers),
           );
         },
       ),
