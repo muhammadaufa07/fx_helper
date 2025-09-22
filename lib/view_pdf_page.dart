@@ -128,7 +128,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
           child: Icon(Icons.download, color: Colors.white),
         ),
         onPressed: () {
-          printPdfFromUrl(widget.url ?? '');
+          printPdfFromUrl(pdfUrl!);
         },
       ),
       body: Builder(
@@ -137,7 +137,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
             return Center(child: CircularProgressIndicator(color: const Color(0xFFAC1F1F)));
           }
 
-          if ((pdfUrl ?? '').isEmpty) {
+          if ((pdfUrl!).isEmpty) {
             return Center(
               child: Text("Gagal memuat PDF", style: TextStyle(color: Colors.red)),
             );
@@ -149,7 +149,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
 
           return SfPdfViewerTheme(
             data: SfPdfViewerThemeData(backgroundColor: Colors.white, progressBarColor: const Color(0xFFAC1F1F)),
-            child: SfPdfViewer.network(pdfUrl ?? '', headers: widget.headers),
+            child: SfPdfViewer.network(pdfUrl!, headers: widget.headers),
           );
         },
       ),
