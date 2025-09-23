@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:fx_helper/snackbar_helper.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class PickerHelper {
@@ -69,6 +72,16 @@ class PickerHelper {
       return result.files.first;
     } else {
       SnackbarHelper.showSnackBar(SnackbarState.success, "Cancelled");
+    }
+    return null;
+  }
+
+  Future<File?> pickPhoto(ImageSource media, {int quality = 50}) async {
+    final ImagePicker picker = ImagePicker();
+    var foto = await picker.pickImage(source: media, imageQuality: quality);
+    if (foto != null) {
+      File image = File(foto.path);
+      return image;
     }
     return null;
   }

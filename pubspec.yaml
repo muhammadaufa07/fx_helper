@@ -25,6 +25,7 @@ dependencies:
   file_picker: ^10.3.3
   month_picker_dialog: ^6.5.0
   calendar_date_picker2: ^2.0.1
+  image_picker: ^1.2.0
 
 dev_dependencies:
   flutter_test:
