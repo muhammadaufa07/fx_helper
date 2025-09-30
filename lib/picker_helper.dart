@@ -28,14 +28,15 @@ class PickerHelper {
     return result;
   }
 
-  static Future<DateTime?> pickDate(BuildContext context) async {
+  static Future<DateTime?> pickDate(BuildContext context, {DateTime? firstDate, DateTime? lastDate}) async {
     final result = await showCalendarDatePicker2Dialog(
       context: context,
       config: CalendarDatePicker2WithActionButtonsConfig(
         // selectedDayHighlightColor: primaryColor,
         calendarType: CalendarDatePicker2Type.single,
         // daySplashColor: primaryColor.withValues(alpha: 0.3),
-        firstDate: DateTime(1900),
+        firstDate: firstDate ?? DateTime(1900),
+        lastDate: lastDate,
       ),
       dialogSize: const Size(325, 370),
       borderRadius: BorderRadius.circular(15),
@@ -76,7 +77,7 @@ class PickerHelper {
     return null;
   }
 
-  Future<File?> pickPhoto(ImageSource media, {int quality = 50}) async {
+  static Future<File?> pickPhoto(ImageSource media, {int quality = 50}) async {
     final ImagePicker picker = ImagePicker();
     var foto = await picker.pickImage(source: media, imageQuality: quality);
     if (foto != null) {
