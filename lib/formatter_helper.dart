@@ -10,7 +10,10 @@ class FormatterHelper {
   /// ```dart
   /// FormatterHelper.formatRp(25000); // "Rp25,000"
   /// ```
-  static String formatRp(int price) {
+  static String formatRp(int? price) {
+    if (price == null) {
+      return "Rp0";
+    }
     var formatter = NumberFormat('###,###', 'id');
     return "Rp${formatter.format((price))}";
   }
@@ -21,7 +24,10 @@ class FormatterHelper {
   /// ```dart
   /// FormatterHelper.formatRpDouble(12345.67); // "Rp12,346"
   /// ```
-  static String formatRpDouble(double price) {
+  static String formatRpDouble(double? price) {
+    if (price == null) {
+      return "Rp0";
+    }
     var formatter = NumberFormat('###,###', 'id');
     return "Rp${formatter.format((price))}";
   }
