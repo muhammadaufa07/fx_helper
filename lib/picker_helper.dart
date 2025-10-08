@@ -47,12 +47,8 @@ class PickerHelper {
     var time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-      builder: (BuildContext context, Widget? child) {
-        return Localizations.override(
-          context: context,
-          locale: const Locale('id', 'ID'),
-          child: MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!),
-        );
+      builder: (_, Widget? child) {
+        return MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!);
       },
     );
     return time;
