@@ -12,16 +12,13 @@ class PickerHelper {
     final result = await showCalendarDatePicker2Dialog(
       context: context,
       config: CalendarDatePicker2WithActionButtonsConfig(
-        // selectedDayHighlightColor: primaryColor,
         calendarType: CalendarDatePicker2Type.range,
-        // daySplashColor: primaryColor.withValues(alpha: 0.3),
         firstDate: DateTime(1900),
       ),
       dialogSize: const Size(325, 370),
       borderRadius: BorderRadius.circular(15),
       value: [DateTime.now()],
       dialogBackgroundColor: Colors.white,
-      // barrierColor: greyColor.withValues(alpha: 0.6),
       barrierDismissible: true,
       useSafeArea: true,
     );
@@ -32,9 +29,7 @@ class PickerHelper {
     final result = await showCalendarDatePicker2Dialog(
       context: context,
       config: CalendarDatePicker2WithActionButtonsConfig(
-        // selectedDayHighlightColor: primaryColor,
         calendarType: CalendarDatePicker2Type.single,
-        // daySplashColor: primaryColor.withValues(alpha: 0.3),
         firstDate: firstDate ?? DateTime(1900),
         lastDate: lastDate,
       ),
@@ -42,15 +37,24 @@ class PickerHelper {
       borderRadius: BorderRadius.circular(15),
       value: [DateTime.now()],
       dialogBackgroundColor: Colors.white,
-      // barrierColor: greyColor.withValues(alpha: 0.6),
       barrierDismissible: true,
       useSafeArea: true,
     );
     return result?.first;
   }
 
-  static Future<TimeOfDay?> pickTime(BuildContext context) {
-    var time = showTimePicker(context: context, initialTime: TimeOfDay.now());
+  static Future<TimeOfDay?> pickTime(BuildContext context) async {
+    var time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Localizations.override(
+          context: context,
+          locale: const Locale('id', 'ID'),
+          child: MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!),
+        );
+      },
+    );
     return time;
   }
 
@@ -95,34 +99,14 @@ class PickerHelper {
       lastDate: DateTime.now(),
       onlyYear: true,
       monthPickerDialogSettings: MonthPickerDialogSettings(
-        headerSettings: PickerHeaderSettings(
-          // headerBackgroundColor: primaryColor,
-          // headerCurrentPageTextStyle: textStyleBig(appContext).copyWith(fontWeight: FontWeight.bold, color: whiteColor),
-          // headerSelectedIntervalTextStyle: textStyleMedium(
-          //   appContext,
-          // ).copyWith(fontWeight: FontWeight.bold, color: whiteColor),
-        ),
-        dateButtonsSettings: PickerDateButtonsSettings(
-          // monthTextStyle: textStyleSmall(appContext).copyWith(fontWeight: FontWeight.bold),
-          // yearTextStyle: textStyleSmall(appContext).copyWith(fontWeight: FontWeight.bold),
-          // unselectedMonthsTextColor: primaryColor,
-          // currentMonthTextColor: blackColor,
-        ),
+        headerSettings: PickerHeaderSettings(),
+        dateButtonsSettings: PickerDateButtonsSettings(),
         dialogSettings: PickerDialogSettings(
           // dialogBackgroundColor: whiteColor,
           dismissible: true,
           locale: Locale('id'),
         ),
-        actionBarSettings: PickerActionBarSettings(
-          confirmWidget: Text(
-            'Pilih',
-            // style: textStyleSmall(appContext).copyWith(fontWeight: FontWeight.bold, color: blackColor),
-          ),
-          cancelWidget: Text(
-            'Batal',
-            // style: textStyleSmall(appContext).copyWith(fontWeight: FontWeight.bold, color: primaryColor),
-          ),
-        ),
+        actionBarSettings: PickerActionBarSettings(confirmWidget: Text('Pilih'), cancelWidget: Text('Batal')),
       ),
     );
   }
@@ -138,34 +122,8 @@ class PickerHelper {
       firstDate: firstDate ?? DateTime(1900, 12, 1),
       lastDate: DateTime.now(),
       monthPickerDialogSettings: MonthPickerDialogSettings(
-        // headerSettings: PickerHeaderSettings(
-        //   headerBackgroundColor: primaryColor,
-        //   headerCurrentPageTextStyle: textStyleBig(appContext).copyWith(fontWeight: FontWeight.bold, color: whiteColor),
-        //   headerSelectedIntervalTextStyle: textStyleMedium(
-        //     appContext,
-        //   ).copyWith(fontWeight: FontWeight.bold, color: whiteColor),
-        // ),
-        // dateButtonsSettings: PickerDateButtonsSettings(
-        //   monthTextStyle: textStyleSmall(appContext).copyWith(fontWeight: FontWeight.bold),
-        //   yearTextStyle: textStyleSmall(appContext).copyWith(fontWeight: FontWeight.bold),
-        //   unselectedMonthsTextColor: primaryColor,
-        //   currentMonthTextColor: blackColor,
-        // ),
-        dialogSettings: PickerDialogSettings(
-          // dialogBackgroundColor: whiteColor,
-          dismissible: true,
-          locale: Locale('id'),
-        ),
-        actionBarSettings: PickerActionBarSettings(
-          confirmWidget: Text(
-            'Pilih',
-            // style: textStyleSmall(appContext).copyWith(fontWeight: FontWeight.bold, color: blackColor),
-          ),
-          cancelWidget: Text(
-            'Batal',
-            // style: textStyleSmall(appContext).copyWith(fontWeight: FontWeight.bold, color: primaryColor),
-          ),
-        ),
+        dialogSettings: PickerDialogSettings(dismissible: true, locale: Locale('id')),
+        actionBarSettings: PickerActionBarSettings(confirmWidget: Text('Pilih'), cancelWidget: Text('Batal')),
       ),
     );
   }
