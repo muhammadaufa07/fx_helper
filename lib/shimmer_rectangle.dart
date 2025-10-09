@@ -1,15 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
+/// A widget that shows a **shimmer effect placeholder** while loading,
+/// and displays the actual [child] when data is available.
+///
+/// Useful for loading states in lists, cards, or other UI elements.
 class ShimmerRectangle extends StatelessWidget {
+  /// The height of the shimmer container.
   final double? height;
+
+  /// The width of the shimmer container.
   final double? width;
+
+  /// The minimum width constraint for the shimmer container.
   final double? minWidth;
+
+  /// The minimum height constraint for the shimmer container.
   final double? minHeight;
+
+  /// Determines whether the shimmer effect should be shown (`true`) or
+  /// the actual [child] should be displayed (`false`).
   final bool isLoading;
+
+  /// The border radius of the shimmer container.
   final BorderRadius? borderRadius;
+
+  /// The child widget to display when not loading.
   final Widget child;
 
+  /// Creates a [ShimmerRectangle] widget.
+  ///
+  /// Example:
+  /// ```dart
+  /// ShimmerRectangle(
+  ///   isLoading: true,
+  ///   child: Text('Loaded content'),
+  /// )
+  /// ```
   const ShimmerRectangle({
     super.key,
     this.height,
@@ -43,14 +70,41 @@ class ShimmerRectangle extends StatelessWidget {
   }
 }
 
+/// A simpler shimmer widget for **rectangular or circular placeholders**.
+///
+/// Can be used when you only need a fixed shimmer rectangle or circle
+/// without wrapping another widget.
 class ShimmerWidget extends StatelessWidget {
+  /// The width of the shimmer widget.
   final double width;
-  final double height;
-  final double radius;
-  // final ShapeBorder shapeBorder;
 
+  /// The height of the shimmer widget.
+  final double height;
+
+  /// The border radius of the shimmer widget.
+  /// For circular shimmer, use a large radius.
+  final double radius;
+
+  /// Creates a rectangular shimmer widget.
+  ///
+  /// Example:
+  /// ```dart
+  /// ShimmerWidget.rectangular(
+  ///   height: 20,
+  ///   width: 100,
+  /// )
+  /// ```
   const ShimmerWidget.rectangular({super.key, this.width = double.infinity, required this.height, this.radius = 12});
 
+  /// Creates a circular shimmer widget.
+  ///
+  /// Example:
+  /// ```dart
+  /// ShimmerWidget.circular(
+  ///   height: 50,
+  ///   width: 50,
+  /// )
+  /// ```
   const ShimmerWidget.circular({super.key, this.width = double.infinity, required this.height, this.radius = 1000});
 
   @override
