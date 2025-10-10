@@ -41,15 +41,11 @@ class ImageNetworkApi extends StatelessWidget {
           },
       httpHeaders: headers,
       imageBuilder: (context, imageProvider) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return Container(
-              height: height ?? (constraints.hasBoundedHeight ? constraints.biggest.height : constraints.biggest.width),
-              decoration: BoxDecoration(
-                image: DecorationImage(image: imageProvider, fit: fit ?? BoxFit.cover),
-              ),
-            );
-          },
+        return Container(
+          height: height ?? MediaQuery.sizeOf(context).height,
+          decoration: BoxDecoration(
+            image: DecorationImage(image: imageProvider, fit: fit ?? BoxFit.cover),
+          ),
         );
       },
 

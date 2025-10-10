@@ -91,8 +91,8 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
             Padding(
               padding: EdgeInsets.all(20),
               child: Container(
-                width: MediaQuery.of(context).size.width / 8.5,
-                height: MediaQuery.of(context).size.width / 8.5,
+                width: MediaQuery.sizeOf(context).width / 8.5,
+                height: MediaQuery.sizeOf(context).width / 8.5,
                 decoration: BoxDecoration(
                   color: const Color(0xFFFCFCFC),
                   borderRadius: BorderRadius.circular(12),
