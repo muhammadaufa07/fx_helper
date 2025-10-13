@@ -5,21 +5,10 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "fx_helper",
-			"request": "launch",
-			"type": "dart"
-		},
-		{
-			"name": "fx_helper (profile mode)",
-			"request": "launch",
+			"name": "Flutter",
 			"type": "dart",
-			"flutterMode": "profile"
-		},
-		{
-			"name": "fx_helper (release mode)",
 			"request": "launch",
-			"type": "dart",
-			"flutterMode": "release"
+			"program": "lib/main.dart"
 		}
 	]
 }
