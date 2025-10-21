@@ -61,7 +61,7 @@ class RegexpHelper {
         hasLower(password) &&
         hasNumber(password) &&
         hasSpecialChar(password) &&
-        (password ?? "").length < 8;
+        (password ?? "").length >= 8;
   }
 
   static bool hasUpper(String? text) {
