@@ -33,7 +33,7 @@ class ShimmerRectangle extends StatelessWidget {
   /// Example:
   /// ```dart
   /// ShimmerRectangle(
-  ///   isLoading: true,
+  ///   isLoading: false,
   ///   child: Text('Loaded content'),
   /// )
   /// ```
