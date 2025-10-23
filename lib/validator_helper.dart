@@ -35,10 +35,10 @@ class ValidatorHelper {
     print("validatePassword($password, $password2)");
     if (password == null || password.isEmpty) {
       return "Silahkan Masukkan Password Anda";
-    } else if (!RegexpHelper.isPassword(password)) {
-      return "Password setidak nya memiliki:\n${_passwordWarning(password ?? "")}";
     } else if (password2 != null && password != password2) {
       return "Password tidak sama";
+    } else if (!RegexpHelper.isPassword(password)) {
+      return "Password setidak nya memiliki:\n${_passwordWarning(password ?? "")}";
     }
     return null;
   }
