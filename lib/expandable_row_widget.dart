@@ -17,6 +17,7 @@ class ExpandableRowWidget<T> extends StatelessWidget {
   final Widget? leadingIcon;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
   final Function(int index, T item)? onChildItemTap;
+  final EdgeInsets? padding;
 
   const ExpandableRowWidget({
     super.key,
@@ -34,6 +35,7 @@ class ExpandableRowWidget<T> extends StatelessWidget {
     this.leadingIcon,
     this.subPadding,
     this.onChildItemTap,
+    this.padding,
   });
 
   @override
@@ -55,7 +57,7 @@ class ExpandableRowWidget<T> extends StatelessWidget {
                 isLoading: isLoading,
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: padding ?? EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: leadingIcon,
                   title: Text(title, style: titleStyle ?? TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: subtitle == null
