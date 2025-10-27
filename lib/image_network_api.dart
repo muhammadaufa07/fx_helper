@@ -11,6 +11,7 @@ class ImageNetworkApi extends StatelessWidget {
   final Map<String, String>? headers;
   final Widget Function(BuildContext, String, Object?)? errorBuilder;
   final Widget Function(BuildContext context, String url)? loadingBuilder;
+  final bool noCache;
   const ImageNetworkApi(
     this.url, {
     super.key,
@@ -21,14 +22,22 @@ class ImageNetworkApi extends StatelessWidget {
     this.headers,
     this.errorBuilder,
     this.loadingBuilder,
+    this.noCache = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (noCache) {
+      CachedNetworkImage.evictFromCache(url!);
+      print("Remove-cache: $url");
+    }
+
     if (url == null || url?.isEmpty == true) {
       return _noImageIcon();
     }
+
     return CachedNetworkImage(
+      cacheKey: url,
       imageUrl: url ?? "",
       placeholderFadeInDuration: Duration(milliseconds: 1000),
       fadeInDuration: Duration(milliseconds: 1000),
