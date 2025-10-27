@@ -152,7 +152,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
           }
 
           if ((widget.localFile != null) && pdfUrl == null) {
-            return SfPdfViewer.file(File(widget.localFile ?? ''));
+            return SfPdfViewer.asset(widget.localFile ?? "");
           }
 
           if ((pdfUrl ?? '').isEmpty || pdfUrl == null) {
