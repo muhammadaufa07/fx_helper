@@ -38,7 +38,7 @@ class ValidatorHelper {
     } else if (password2 != null && password != password2) {
       return "Password tidak sama";
     } else if (!RegexpHelper.isPassword(password)) {
-      return "Password setidak nya memiliki:\n${_passwordWarning(password ?? "")}";
+      return "Password setidak nya memiliki:\n${_passwordWarning(password)}";
     }
     return null;
   }

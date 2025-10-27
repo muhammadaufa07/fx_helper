@@ -151,14 +151,14 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
             return Center(child: CircularProgressIndicator(color: const Color(0xFFAC1F1F)));
           }
 
+          if (widget.localFile != null) {
+            return SfPdfViewer.file(File(widget.localFile ?? ''));
+          }
+
           if ((pdfUrl ?? '').isEmpty) {
             return Center(
               child: Text("Gagal memuat PDF", style: TextStyle(color: Colors.red)),
             );
-          }
-
-          if (widget.localFile != null) {
-            return SfPdfViewer.file(File(widget.localFile ?? ''));
           }
 
           return SfPdfViewerTheme(
