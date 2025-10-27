@@ -165,7 +165,7 @@ class PickerHelper {
   ///   print('Captured photo path: ${photo.path}');
   /// }
   /// ```
-  static Future<File?> pickPhoto(ImageSource media, {int quality = 50}) async {
+  static Future<File?> pickPhoto({ImageSource media = ImageSource.camera, int quality = 50}) async {
     final ImagePicker picker = ImagePicker();
     var foto = await picker.pickImage(source: media, imageQuality: quality);
     if (foto != null) {
