@@ -30,7 +30,9 @@ class ImageNetworkApi extends StatelessWidget {
     }
     return CachedNetworkImage(
       imageUrl: url ?? "",
-
+      placeholderFadeInDuration: Duration(milliseconds: 1000),
+      fadeInDuration: Duration(milliseconds: 1000),
+      fadeInCurve: Curves.fastEaseInToSlowEaseOut,
       width: width,
       height: height,
       placeholder:

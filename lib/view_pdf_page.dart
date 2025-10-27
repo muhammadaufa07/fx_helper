@@ -9,12 +9,22 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class ViewPdfPage extends StatefulWidget {
-  final String title;
+  final String? title;
   final String? url;
   final String? localFile;
+  final bool allowDownload;
+  final AppBar? appBar;
   final Map<String, String>? headers;
 
-  const ViewPdfPage({super.key, required this.title, this.url, this.headers, this.localFile});
+  const ViewPdfPage({
+    super.key,
+    required this.title,
+    this.url,
+    this.headers,
+    this.localFile,
+    this.allowDownload = true,
+    required this.appBar,
+  });
   @override
   _ViewPdfPageState createState() => _ViewPdfPageState();
 }
@@ -80,57 +90,61 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        surfaceTintColor: Colors.transparent,
-        toolbarHeight: 80,
-        leading: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Container(
-                width: MediaQuery.sizeOf(context).width / 8.5,
-                height: MediaQuery.sizeOf(context).width / 8.5,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFCFCFC),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Color(0xFFF0F0F0)),
-                ),
-                child: Material(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: const Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Icon(Icons.arrow_back_ios, color: Colors.black, size: 25),
+      appBar:
+          widget.appBar ??
+          AppBar(
+            backgroundColor: Colors.white,
+            automaticallyImplyLeading: false,
+            surfaceTintColor: Colors.transparent,
+            toolbarHeight: 80,
+            leading: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Container(
+                    width: MediaQuery.sizeOf(context).width / 8.5,
+                    height: MediaQuery.sizeOf(context).width / 8.5,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFCFCFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Color(0xFFF0F0F0)),
+                    ),
+                    child: Material(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: const Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Icon(Icons.arrow_back_ios, color: Colors.black, size: 25),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-        leadingWidth: 90,
-        title: Text(widget.title),
-        centerTitle: true,
-        titleTextStyle: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
-      ),
-      floatingActionButton: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: const Color(0xFFAC1F1F)),
-          child: Icon(Icons.download, color: Colors.white),
-        ),
-        onPressed: () {
-          printPdfFromUrl(pdfUrl ?? '');
-        },
-      ),
+            leadingWidth: 90,
+            title: Text(widget.title ?? "PDF"),
+            centerTitle: true,
+            titleTextStyle: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+      floatingActionButton: widget.allowDownload
+          ? IconButton(
+              icon: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: const Color(0xFFAC1F1F)),
+                child: Icon(Icons.download, color: Colors.white),
+              ),
+              onPressed: () {
+                printPdfFromUrl(pdfUrl ?? '');
+              },
+            )
+          : null,
       body: Builder(
         builder: (context) {
           if (isLoading) {
