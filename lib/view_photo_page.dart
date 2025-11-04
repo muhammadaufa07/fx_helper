@@ -2,20 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
 class ViewImagePage extends StatelessWidget {
-  final String photoUrl;
+  final String? photoUrl;
   final Map<String, String>? headers;
-  const ViewImagePage({super.key, required this.photoUrl, this.headers});
+  final PreferredSizeWidget? appBar;
+  final FloatingActionButton? fab;
+  final bool hideDefaultFab;
+  const ViewImagePage({
+    super.key,
+    required this.photoUrl,
+    this.headers,
+    this.appBar,
+    this.fab,
+    this.hideDefaultFab = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      floatingActionButton: backButton(context),
+      floatingActionButton: hideDefaultFab ? null : fab ?? backButton(context),
+      appBar: appBar,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
       body: SafeArea(
         top: false,
         child: PhotoView(
-          imageProvider: NetworkImage(photoUrl, headers: headers),
+          imageProvider: NetworkImage(photoUrl ?? "", headers: headers),
           loadingBuilder: (context, event) => const Center(child: CircularProgressIndicator(color: Colors.white)),
           errorBuilder: (context, error, stackTrace) => Center(
             child: Text(
