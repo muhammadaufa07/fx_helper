@@ -35,7 +35,7 @@ class LoggerHelper {
               } else {
                 lvl = record.level.name;
               }
-              print('$lvl: ${FormatterHelper.formatDateToTimeHHMMss(record.time)}: ${record.message}');
+              print('$lvl: ${FormatterHelper.formatTimeWithSeconds(record.time)}: ${record.message}');
             }
           },
     );
