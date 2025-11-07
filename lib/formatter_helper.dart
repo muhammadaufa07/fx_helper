@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class FormatterHelper {
-  static final String _errorMessage = "Date Error";
+  static final String _errorMessage = "";
 
   // ORIGINAL: formatRp / formatRpDouble
   /// Format value into Indonesian Rupiah (e.g., `Rp25.000`).
