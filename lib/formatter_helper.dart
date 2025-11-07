@@ -12,6 +12,20 @@ class FormatterHelper {
     return formatter.format(value);
   }
 
+  // ORIGINAL: getHeaderFormattedDate
+  /// Format datetime into `E, dd MMM yyyy HH:mm:ss` (e.g., `Sen, 15 Sep 2025 14:30:00`)
+  static String formatDateShortWeekdayWithTime(DateTime? dateTime) {
+    if (dateTime == null) return _errorMessage;
+    return DateFormat('E, dd MMM yyyy HH:mm:ss', 'id').format(dateTime);
+  }
+
+  // NEW
+  /// Format datetime into `dd-MM-yyyy HH:mm` (e.g., `15-09-2025 14:30`)
+  static String formatDateDMYWithTime(DateTime? dateTime) {
+    if (dateTime == null) return _errorMessage;
+    return DateFormat('dd-MM-yyyy HH:mm', 'id').format(dateTime);
+  }
+
   // ORIGINAL: formatDatedMy
   /// Format date into `d-M-yyyy` (e.g., `5-9-2025`).
   static String formatDateDMY(DateTime? date) {
