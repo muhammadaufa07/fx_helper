@@ -73,13 +73,6 @@ class SecureStorage {
 
   Future<void> deleteToken() async => await storage.delete(key: "token");
 
-  /// --- Login Data ---
-  Future<void> deleteAllLoginData() async {
-    await storage.delete(key: "token");
-    await storage.delete(key: "biometric_email");
-    await storage.delete(key: "biometric_password");
-  }
-
   /// --- Biometric ---
   Future<void> setAllowBiometricLogin(bool value) async => await _safeWrite("allowBiometricLogin", value.toString());
 
@@ -101,5 +94,11 @@ class SecureStorage {
   /// --- Global Delete ---
   Future<void> deleteAll() async {
     await storage.deleteAll();
+  }
+
+  Future<void> deleteAllLoginData() async {
+    await storage.delete(key: "token");
+    await storage.delete(key: "biometric_email");
+    await storage.delete(key: "biometric_password");
   }
 }
