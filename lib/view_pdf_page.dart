@@ -1,88 +1,95 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fx_helper/snackbar_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
-
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
+enum ViewPdfType { asset, network, file }
+
 class ViewPdfPage extends StatefulWidget {
   final String? title;
-  final String? url;
-  final String? localFile;
+  final String? path;
+  final ViewPdfType viewPdfType;
   final bool allowDownload;
   final AppBar? appBar;
   final Map<String, String>? headers;
-
+  final String? onDownloadFileName;
+  /* 
+    path could be local, asset, or from network, 
+   */
   const ViewPdfPage({
     super.key,
-    required this.title,
-    this.url,
+    @Deprecated("Use [appBar instead]") required this.title,
+    this.path,
     this.headers,
-    this.localFile,
-    this.allowDownload = true,
+    required this.allowDownload,
     this.appBar,
+    this.onDownloadFileName,
+    required this.viewPdfType,
   });
   @override
   _ViewPdfPageState createState() => _ViewPdfPageState();
 }
 
 class _ViewPdfPageState extends State<ViewPdfPage> {
-  // Map<String, String>? headers = {};
+  final _controller = PdfViewerController();
   bool isLoading = false;
   String? pdfUrl;
+
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      loadPdf();
+    if (widget.allowDownload == true) {
+      assert(widget.onDownloadFileName?.isNotEmpty ?? false, "DownloadFileName is Required");
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
     });
-
     super.initState();
   }
 
-  Future<void> loadPdf() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      if (widget.url != null) {
-        // headers = widget.headers;
-
-        var url = widget.url;
-        // var response = await Network.get(Net.gateway, widget.url ?? '');
-        // if (response.statusCode == 200) {
-        pdfUrl = url;
-        // } else {}
-      }
-      //  else {
-      //   pdfUrl = widget.publicUrl ?? '';
-      // }
-      setState(() {});
-    } catch (e) {}
-
-    setState(() {
-      isLoading = false;
-    });
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
-  Future<void> printPdfFromUrl(String url) async {
+  Future<void> download() async {
+    isLoading = true;
+    setState(() {});
     try {
-      final uri = Uri.parse(url);
-      final headersMap = widget.headers;
+      Uint8List? pdfBytes;
+      if (widget.viewPdfType == ViewPdfType.asset) {
+        final byteData = await rootBundle.load(widget.path ?? "");
+        pdfBytes = byteData.buffer.asUint8List();
+      } else if (widget.viewPdfType == ViewPdfType.network) {
+        final uri = Uri.parse(widget.path ?? "");
+        final response = await http.get(uri, headers: widget.headers);
+        if (response.statusCode == 200) {
+          pdfBytes = response.bodyBytes;
+        }
+      } else if (widget.viewPdfType == ViewPdfType.file) {
+        File f = File(widget.path ?? "");
+        pdfBytes = await f.readAsBytes();
+      }
 
-      final response = await http.get(uri, headers: headersMap);
-
-      if (response.statusCode == 200) {
-        final pdfData = response.bodyBytes;
-
+      if (pdfBytes != null) {
         await Printing.layoutPdf(
-          onLayout: (PdfPageFormat format) async => pdfData,
-          name: "Payslip ${DateTime.now().toIso8601String()}",
+          onLayout: (PdfPageFormat format) async => pdfBytes!,
+          name: widget.onDownloadFileName ?? "",
         );
-      } else {}
-    } catch (e) {}
+      } else {
+        SnackbarHelper.showSnackBar(SnackbarState.warning, "Could not read pdf");
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    isLoading = false;
+    setState(() {});
   }
 
   @override
@@ -140,7 +147,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
                 child: Icon(Icons.download, color: Colors.white),
               ),
               onPressed: () {
-                printPdfFromUrl(pdfUrl ?? '');
+                download();
               },
             )
           : null,
@@ -150,11 +157,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
             return Center(child: CircularProgressIndicator(color: const Color(0xFFAC1F1F)));
           }
 
-          if ((widget.localFile != null) && pdfUrl == null) {
-            return SfPdfViewer.asset(widget.localFile ?? "");
-          }
-
-          if ((pdfUrl ?? '').isEmpty || pdfUrl == null) {
+          if (widget.path == null || widget.path?.isEmpty == true) {
             return Center(
               child: Text("Gagal memuat PDF", style: TextStyle(color: Colors.red)),
             );
@@ -162,7 +165,19 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
 
           return SfPdfViewerTheme(
             data: SfPdfViewerThemeData(backgroundColor: Colors.white, progressBarColor: const Color(0xFFAC1F1F)),
-            child: SfPdfViewer.network(pdfUrl ?? "", headers: widget.headers),
+            child: Builder(
+              builder: (context) {
+                if (widget.viewPdfType == ViewPdfType.asset) {
+                  return SfPdfViewer.asset(controller: _controller, widget.path ?? "");
+                } else if (widget.viewPdfType == ViewPdfType.network) {
+                  return SfPdfViewer.network(controller: _controller, widget.path ?? "", headers: widget.headers);
+                } else if (widget.viewPdfType == ViewPdfType.file) {
+                  File f = File(widget.path ?? "");
+                  return SfPdfViewer.file(f);
+                }
+                return Text("Err", maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.start);
+              },
+            ),
           );
         },
       ),

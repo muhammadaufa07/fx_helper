@@ -7,6 +7,7 @@ import 'package:local_auth_darwin/types/auth_messages_ios.dart';
 ///
 /// This class provides utilities to check device support, available biometric types,
 /// and perform user authentication using biometrics.
+@Deprecated("Use Biometric Provider Instead")
 class BiometricHelper {
   late final LocalAuthentication auth;
 
