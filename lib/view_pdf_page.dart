@@ -22,7 +22,7 @@ class ViewPdfPage extends StatefulWidget {
     this.headers,
     this.localFile,
     this.allowDownload = true,
-    required this.appBar,
+    this.appBar,
   });
   @override
   _ViewPdfPageState createState() => _ViewPdfPageState();
