@@ -14,7 +14,6 @@ class InAppNotification {
     Widget? icon,
     required Color color,
     Duration? duration,
-    Alignment? alignment,
   }) {
     late OverlayEntry overlayEntry;
     overlayEntry = OverlayEntry(
@@ -97,11 +96,13 @@ class _InAppNotifCardState extends State<InAppNotifCard> with TickerProviderStat
     // Slide in animasi
     _slideController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -1),
+      begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic));
 
-    _slideController.forward();
+    // _slideController.forward().then((value) {
+    //   _slideController.
+    // });
 
     // Kalau ada durasi, bikin progress bar countdown
     if (widget.duration != null) {
@@ -111,6 +112,11 @@ class _InAppNotifCardState extends State<InAppNotifCard> with TickerProviderStat
       _getBackdropHeight();
     });
     super.initState();
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
   }
 
   @override

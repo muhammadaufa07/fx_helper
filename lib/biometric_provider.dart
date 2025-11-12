@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fx_helper/secure_storage.dart';
 import 'package:fx_helper/snackbar_helper.dart';
-import 'package:fx_helper/validator_helper.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_darwin/types/auth_messages_ios.dart';
@@ -73,11 +72,11 @@ class BiometricProvider extends ChangeNotifier {
   }
 
   Future<bool> _checkAllowLoginWithBiometric() async {
-    String email = await SecureStorage().getBiometricEmail();
-    String password = await SecureStorage().getBiometricPassword();
-    bool isEmailPassCorrect =
-        ValidatorHelper.validateEmail(email) == null && ValidatorHelper.validatePassword(password) == null;
-    allowLoginWithBiometric = isEmailPassCorrect && await _isSupported() && await isEnabled();
+    // String email = await SecureStorage().getBiometricEmail();
+    // String password = await SecureStorage().getBiometricPassword();
+    // bool isEmailPassCorrect =
+    //     ValidatorHelper.validateEmail(email) == null && ValidatorHelper.validatePassword(password) == null;
+    allowLoginWithBiometric = await _isSupported() && await isEnabled();
     return allowLoginWithBiometric;
   }
 
