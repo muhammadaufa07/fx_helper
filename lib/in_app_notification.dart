@@ -20,7 +20,7 @@ class InAppNotification {
       builder: (context) {
         int multiplier = _e.indexOf(overlayEntry);
         return Positioned(
-          bottom: MediaQuery.of(context).padding.top + 30 + ((multiplier) * _stackOffset),
+          bottom: MediaQuery.of(context).padding.top + 100 + ((multiplier) * _stackOffset),
           left: 16 + ((multiplier) * 1),
           right: 16 - ((multiplier) * 1),
           child: InAppNotifCard(
@@ -129,128 +129,131 @@ class _InAppNotifCardState extends State<InAppNotifCard> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     Color pColor = widget.color;
-    return Material(
-      color: Colors.transparent,
-      child: Row(
-        children: [
-          Expanded(
-            child: SlideTransition(
-              position: _slideAnimation!,
-              child: Dismissible(
-                key: UniqueKey(),
-                direction: DismissDirection.vertical, // bisa swipe ke atas buat close
-                onDismissed: (_) => widget.onClose(),
+    return SafeArea(
+      top: false,
+      child: Material(
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Expanded(
+              child: SlideTransition(
+                position: _slideAnimation!,
+                child: Dismissible(
+                  key: UniqueKey(),
+                  direction: DismissDirection.vertical, // bisa swipe ke atas buat close
+                  onDismissed: (_) => widget.onClose(),
 
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadiusGeometry.circular(12),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                        child: Builder(
-                          builder: (context) {
-                            return Container(height: _backdropHeight);
-                          },
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadiusGeometry.circular(12),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                          child: Builder(
+                            builder: (context) {
+                              return Container(height: _backdropHeight);
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      key: _containerKey,
-                      padding: EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: pColor, width: 1),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              widget.icon ?? Icon(Icons.check_circle, color: pColor, size: 52),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      widget.title,
-                                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: pColor),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      widget.message,
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w600,
-                                        color: pColor,
-                                        fontSize: 12,
+                      Container(
+                        key: _containerKey,
+                        padding: EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: pColor, width: 1),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                widget.icon ?? Icon(Icons.check_circle, color: pColor, size: 52),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        widget.title,
+                                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: pColor),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        widget.message,
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w600,
+                                          color: pColor,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                visualDensity: VisualDensity.compact,
-                                icon: Icon(Icons.close, color: pColor),
-                                onPressed: widget.onClose,
-                              ),
-                            ],
-                          ),
-                          if (_progressController != null) ...[
-                            const SizedBox(height: 4),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: Container(
-                                padding: const EdgeInsets.all(1),
-                                decoration: BoxDecoration(color: pColor, borderRadius: BorderRadius.circular(20)),
-                                child: AnimatedBuilder(
-                                  animation: _progressController!,
-                                  // builder: (context, child) => LinearProgressIndicator(
-                                  //   value: 1.0 - (_progressController?.value ?? 0),
-                                  //   backgroundColor: Colors.white,
-                                  //   borderRadius: BorderRadius.circular(20),
-                                  //   valueColor: AlwaysStoppedAnimation<Color>(
-                                  //     pColor.withValues(alpha: 1 - ((_progressController?.value ?? 0) * 0.5)),
-                                  //   ),
-                                  //   minHeight: 16,
-                                  // ),
-                                  builder: (context, child) => Container(
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          pColor.withValues(
-                                            red: (pColor.r * 1.2),
-                                            green: (pColor.g * 1.2),
-                                            blue: (pColor.b * 1.2),
-                                          ),
-                                          pColor,
-                                          Colors.white,
-                                        ],
-                                        stops: [
-                                          (1 - (_progressController?.value ?? 0)) / 2,
-                                          (1 - (_progressController?.value ?? 0)),
-                                          (1 - (_progressController?.value ?? 0)),
-                                        ],
+                                IconButton(
+                                  visualDensity: VisualDensity.compact,
+                                  icon: Icon(Icons.close, color: pColor),
+                                  onPressed: widget.onClose,
+                                ),
+                              ],
+                            ),
+                            if (_progressController != null) ...[
+                              const SizedBox(height: 4),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: Container(
+                                  padding: const EdgeInsets.all(1),
+                                  decoration: BoxDecoration(color: pColor, borderRadius: BorderRadius.circular(20)),
+                                  child: AnimatedBuilder(
+                                    animation: _progressController!,
+                                    // builder: (context, child) => LinearProgressIndicator(
+                                    //   value: 1.0 - (_progressController?.value ?? 0),
+                                    //   backgroundColor: Colors.white,
+                                    //   borderRadius: BorderRadius.circular(20),
+                                    //   valueColor: AlwaysStoppedAnimation<Color>(
+                                    //     pColor.withValues(alpha: 1 - ((_progressController?.value ?? 0) * 0.5)),
+                                    //   ),
+                                    //   minHeight: 16,
+                                    // ),
+                                    builder: (context, child) => Container(
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            pColor.withValues(
+                                              red: (pColor.r * 1.2),
+                                              green: (pColor.g * 1.2),
+                                              blue: (pColor.b * 1.2),
+                                            ),
+                                            pColor,
+                                            Colors.white,
+                                          ],
+                                          stops: [
+                                            (1 - (_progressController?.value ?? 0)) / 2,
+                                            (1 - (_progressController?.value ?? 0)),
+                                            (1 - (_progressController?.value ?? 0)),
+                                          ],
+                                        ),
                                       ),
+                                      child: const SizedBox(height: 6),
                                     ),
-                                    child: const SizedBox(height: 6),
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
