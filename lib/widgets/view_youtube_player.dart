@@ -57,6 +57,7 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
 
   @override
   void initState() {
+    WidgetsFlutterBinding.ensureInitialized();
     String id = "";
     blockPreview = false;
     if (widget.url?.isUrl() == true) {
@@ -90,6 +91,7 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
       /* setState is Intentional */
       setState(() {});
     });
+
     super.initState();
   }
 
@@ -99,8 +101,9 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
+        _ytController?.pause();
         blockPreview = true;
-        setState(() {});
+
         Orientation currentOrientation = MediaQuery.orientationOf(context);
         if (currentOrientation != originOrientation) {
           if (originOrientation == Orientation.portrait) {
@@ -113,15 +116,15 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
           }
         }
         setState(() {});
-        _ytController?.dispose();
-        Navigator.pop(context);
+        await Future.delayed(Duration(seconds: 1));
+        if (context.mounted) Navigator.pop(context);
       },
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: MediaQuery.orientationOf(context) == Orientation.landscape ? null : widget.appBar,
         body: Builder(
           builder: (context) {
-            if (blockPreview) {
+            if (!mounted || blockPreview) {
               return SizedBox();
             }
             if (widget.url?.isEmpty ?? true) {
@@ -152,10 +155,13 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
 
                 onReady: () {},
                 onEnded: (metaData) {
-                  _ytController?.dispose();
+                  // _ytController?.dispose();
                 },
               ),
               builder: (context, player) {
+                if (!mounted || blockPreview) {
+                  return SizedBox();
+                }
                 return Column(mainAxisAlignment: MainAxisAlignment.center, children: [player]);
               },
             );
@@ -168,7 +174,6 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
   @override
   void dispose() {
     _ytController?.dispose();
-    // await Future.delayed(Duration(seconds: 3));
     super.dispose();
   }
 }
