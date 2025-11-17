@@ -1,4 +1,6 @@
+import 'package:flutter/services.dart';
 import 'package:fx_helper/regexp_helper.dart';
+import 'package:fx_helper/snackbar_helper.dart';
 import 'package:html/parser.dart';
 
 extension StringExtensions on String {
@@ -53,5 +55,10 @@ extension StringExtensions on String {
   /// highlight matching text. use in HtmlView
   String htmlHighlight(String term, {bool caseSensitive = false}) {
     return replaceAll(RegExp(term, caseSensitive: caseSensitive), "<mark>$term</mark>");
+  }
+
+  void copyToClipboard() {
+    Clipboard.setData(ClipboardData(text: this));
+    SnackbarHelper.showSnackBar(SnackbarState.success, "Copied to Clipboard");
   }
 }
