@@ -21,7 +21,7 @@ class HtmlText extends StatelessWidget {
           /*  */
           fontStyle: FontStyle.normal,
           fontSize: FontSize(style?.fontSize ?? 11),
-          fontFamily: "inter, arial, times new roman",
+          fontFamily: "inter",
           color: style?.color ?? Colors.black,
           textAlign: textAlign ?? TextAlign.start,
           margin: Margins.all(0),
