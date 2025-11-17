@@ -1,3 +1,5 @@
+import 'package:fx_helper/regexp_helper.dart';
+
 extension StringExtensions on String {
   /// Capitalizes the **first letter of each word** in the string.
   ///
@@ -21,5 +23,9 @@ extension StringExtensions on String {
           return word[0].toUpperCase() + word.substring(1).toLowerCase();
         })
         .join(' ');
+  }
+
+  bool isUrl() {
+    return RegexpHelper.isUrl(this);
   }
 }

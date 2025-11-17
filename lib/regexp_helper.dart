@@ -79,4 +79,19 @@ class RegexpHelper {
   static bool hasSpecialChar(String? text) {
     return RegExp(r'(?=.*[!@#\$&])').hasMatch(text ?? "");
   }
+
+  /// find youtube video id from youtube url
+  ///
+  /// example:
+  ///     https://www.youtube.com/watch?v=Am5vjvyPjls
+  ///   returns : "Am5vjvyPjls"
+  ///
+  static String? matchAndGetYoutubeVideoId(String? text) {
+    return RegExp(r'(?<=v\=)[a-zA-Z0-9][a-zA-Z0-9]*(?<!\&)').allMatches(text ?? "").first[0];
+  }
+
+  static bool isUrl(String? text) {
+    /* Not regexp but handy to handle url checking */
+    return Uri.tryParse(text ?? "")?.hasAbsolutePath ?? false;
+  }
 }

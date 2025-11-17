@@ -99,10 +99,10 @@ TextStyle textStyleTiny(BuildContext context) {
   return _getFont(context, 32);
 }
 
-// /* Defines global text style associated with design at 12px*/
-// TextStyle textStyleSmall(BuildContext context) {
-//   return _getFont(context, 28);
-// }
+/* Defines global text style associated with design at 12px*/
+TextStyle textStyleSmall(BuildContext context) {
+  return _getFont(context, 28);
+}
 
 // /* Defines global text style associated with design at 14px*/
 // TextStyle textStyleMedium(BuildContext context) {
