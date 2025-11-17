@@ -1,7 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:fx_helper/widgets/fx_theme.dart';
 
+/// Show dialog with yes and no button
+///
+/// usage:
+/// ```
+///     String? t = await showDialog<String>(
+///        context: context,
+///        barrierDismissible: true,
+///        builder: (BuildContext dContext) => AlertDialogYesNo(
+///          title: "Keluar Aplikasi?",
+///          subtitle: "Keluar dari Aplikasi",
+///          yesMsg: "Keluar",
+///          noMsg: "Kembali",
+///        ),
+///      );
+///      if (t == AlertDialogYesNo.yes) {
+///        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+///      }
+/// ```
 class AlertDialogYesNo extends StatelessWidget {
+  static String yes = "y";
+  static String no = "n";
   final String title;
   final String subtitle;
   final String? yesMsg;
@@ -30,7 +50,7 @@ class AlertDialogYesNo extends StatelessWidget {
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
-                  Navigator.pop(context, "n");
+                  Navigator.pop(context, no);
                 },
                 style: ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 4))),
                 child: Text(
@@ -44,7 +64,7 @@ class AlertDialogYesNo extends StatelessWidget {
               child: ElevatedButton(
                 style: ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 4))),
                 onPressed: () {
-                  Navigator.pop(context, "y");
+                  Navigator.pop(context, yes);
                 },
                 child: Text(
                   yesMsg ?? "Yes",

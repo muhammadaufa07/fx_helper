@@ -97,7 +97,7 @@ abstract class FxNetwork {
   Future<http.Response> get(FxNet net, String path) async {
     String uriStr = getDomainName(net) + path;
     Uri uri = Uri.parse(uriStr);
-    return await http.get(uri, headers: await getHeader()).timeout(Duration(seconds: 5));
+    return await http.get(uri, headers: getHeader()).timeout(Duration(seconds: 5));
   }
 
   /// Create a POST Request

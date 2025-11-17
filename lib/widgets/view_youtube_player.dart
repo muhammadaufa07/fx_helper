@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fx_helper/extensions.dart';
+import 'package:fx_helper/extensions/string_extensions.dart';
 import 'package:fx_helper/regexp_helper.dart';
 import 'package:fx_helper/widgets/fx_theme.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';

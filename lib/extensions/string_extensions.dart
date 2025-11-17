@@ -1,4 +1,5 @@
 import 'package:fx_helper/regexp_helper.dart';
+import 'package:html/parser.dart';
 
 extension StringExtensions on String {
   /// Capitalizes the **first letter of each word** in the string.
@@ -25,7 +26,32 @@ extension StringExtensions on String {
         .join(' ');
   }
 
+  String capitalizeFirstWord() {
+    if (length == 0) {
+      return "";
+    } else if (length == 1) {
+      return this[0].toUpperCase();
+    }
+    return this[0].toUpperCase() + substring(1, length);
+  }
+
   bool isUrl() {
     return RegexpHelper.isUrl(this);
+  }
+
+  String stripHtml() {
+    String t = "";
+    try {
+      final doc = parse(this);
+      t = parse(doc.body?.text).documentElement?.text ?? "";
+    } catch (e) {
+      print(e.toString());
+    }
+    return t;
+  }
+
+  /// highlight matching text. use in HtmlView
+  String htmlHighlight(String term, {bool caseSensitive = false}) {
+    return replaceAll(RegExp(term, caseSensitive: caseSensitive), "<mark>$term</mark>");
   }
 }
