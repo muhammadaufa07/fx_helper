@@ -51,7 +51,7 @@ class ViewYoutubePlayer extends StatefulWidget {
 }
 
 class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
-  YoutubePlayerController? _ytController;
+  late YoutubePlayerController _ytController;
   bool blockPreview = false;
   Orientation? originOrientation;
 
@@ -86,6 +86,7 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
         endAt: widget.endAt,
       ),
     );
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       originOrientation = MediaQuery.orientationOf(context);
       /* setState is Intentional */
@@ -101,7 +102,7 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
-        _ytController?.pause();
+        _ytController.pause();
         blockPreview = true;
 
         Orientation currentOrientation = MediaQuery.orientationOf(context);
@@ -116,7 +117,7 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
           }
         }
         setState(() {});
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 500));
         if (context.mounted) Navigator.pop(context);
       },
       child: Scaffold(
@@ -124,9 +125,6 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
         appBar: MediaQuery.orientationOf(context) == Orientation.landscape ? null : widget.appBar,
         body: Builder(
           builder: (context) {
-            if (!mounted || blockPreview) {
-              return SizedBox();
-            }
             if (widget.url?.isEmpty ?? true) {
               return Center(
                 child: Text(
@@ -136,31 +134,32 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
                 ),
               );
             }
-            if (_ytController == null) {
-              return Center(
-                child: Text(
-                  "Controller is Not Ready",
-                  textAlign: TextAlign.start,
-                  style: textStyleSmall(context).copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-              );
-            }
 
             return YoutubePlayerBuilder(
               player: YoutubePlayer(
-                controller: _ytController!,
+                controller: _ytController,
                 showVideoProgressIndicator: true,
                 progressIndicatorColor: primaryColor,
                 progressColors: ProgressBarColors(playedColor: primaryColor, handleColor: primaryColor),
-
-                onReady: () {},
+                onReady: () {
+                  print("onReady()");
+                  // await Future.delayed(Duration(seconds: 3));
+                  // setState(() {});
+                },
                 onEnded: (metaData) {
+                  print("onEnded()");
                   // _ytController?.dispose();
                 },
               ),
               builder: (context, player) {
                 if (!mounted || blockPreview) {
-                  return SizedBox();
+                  return Center(
+                    child: Text(
+                      "Closing...",
+                      textAlign: TextAlign.start,
+                      style: textStyleSmall(context).copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  );
                 }
                 return Column(mainAxisAlignment: MainAxisAlignment.center, children: [player]);
               },
@@ -173,7 +172,7 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
 
   @override
   void dispose() {
-    _ytController?.dispose();
+    _ytController.dispose();
     super.dispose();
   }
 }
