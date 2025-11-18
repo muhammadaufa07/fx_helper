@@ -59,6 +59,12 @@ extension StringExtensions on String {
 
   void copyToClipboard() {
     Clipboard.setData(ClipboardData(text: this));
-    SnackbarHelper.showSnackBar(SnackbarState.success, "Copied to Clipboard");
+    String t = "";
+    if (length > 20) {
+      t = "${substring(0, 20)}...";
+    } else {
+      t = this;
+    }
+    SnackbarHelper.showSnackBar(SnackbarState.success, "$t Copied to Clipboard");
   }
 }
