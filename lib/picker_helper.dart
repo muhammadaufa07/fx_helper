@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:fx_helper/snackbar_helper.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:file_picker/file_picker.dart';
@@ -139,15 +138,15 @@ class PickerHelper {
   ///   print('Image path: ${image.path}');
   /// }
   /// ```
-  static Future<PlatformFile?> pickImage(BuildContext context) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
-    if (result != null) {
-      return result.files.first;
-    } else {
-      SnackbarHelper.showSnackBar(SnackbarState.success, "Cancelled");
-    }
-    return null;
-  }
+  // static Future<PlatformFile?> pickImage(BuildContext context) async {
+  //   FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+  //   if (result != null) {
+  //     return result.files.first;
+  //   } else {
+  //     SnackbarHelper.showSnackBar(SnackbarState.success, "Cancelled");
+  //   }
+  //   return null;
+  // }
 
   /// Opens the **camera** or **gallery** to capture or select a photo.
   ///
