@@ -98,29 +98,13 @@ class PickerHelper {
   }
 
   /// Opens a **file picker** dialog to select a document.
-  ///
-  /// Supported file types:
-  /// - PDF (`.pdf`)
-  /// - Word (`.doc`, `.docx`)
-  /// - PowerPoint (`.ppt`, `.pptx`)
-  /// - Excel (`.xls`, `.xlsx`)
-  ///
-  /// Returns the selected [PlatformFile], or `null` if the user cancels the picker.
-  ///
-  /// ### Example:
-  /// ```dart
-  /// final file = await PickerHelper.pickFile(context);
-  /// if (file != null) {
-  ///   print('File name: ${file.name}');
-  /// }
-  /// ```
-  static Future<PlatformFile?> pickFile(BuildContext context) async {
+  static Future<File?> pickFile(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx"],
     );
     if (result != null) {
-      return result.files.first;
+      return File(result.files.first.path ?? "");
     } else {
       SnackbarHelper.showSnackBar(SnackbarState.success, "Cancelled");
     }
@@ -128,25 +112,16 @@ class PickerHelper {
   }
 
   /// Opens an **image picker** dialog to select an image file from the device storage.
-  ///
-  /// Returns the selected [PlatformFile], or `null` if the user cancels.
-  ///
-  /// ### Example:
-  /// ```dart
-  /// final image = await PickerHelper.pickImage(context);
-  /// if (image != null) {
-  ///   print('Image path: ${image.path}');
-  /// }
-  /// ```
-  // static Future<PlatformFile?> pickImage(BuildContext context) async {
-  //   FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
-  //   if (result != null) {
-  //     return result.files.first;
-  //   } else {
-  //     SnackbarHelper.showSnackBar(SnackbarState.success, "Cancelled");
-  //   }
-  //   return null;
-  // }
+  static Future<File?> pickImage(BuildContext context) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+    if (result != null) {
+      return File(result.files.first.path ?? "");
+    } else {
+      SnackbarHelper.showSnackBar(SnackbarState.success, "Cancelled");
+    }
+
+    return null;
+  }
 
   /// Opens the **camera** or **gallery** to capture or select a photo.
   ///

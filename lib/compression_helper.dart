@@ -29,10 +29,10 @@ class CompressionHelper {
 
   /// Compress image
   ///
+  /// ```
   /// var image = await PickerHelper.pickImage(context);
-  /// File file = File(image?.path ?? "");
-  /// File? f = await CompressionHelper.compressImage(file);
-  /// await CompressionHelper.cleanCache();
+  /// File? f = await CompressionHelper.compressImage(image);
+  /// ```
   static Future<File?> compressImage(
     File? originalFile, {
     CompressFormat format = CompressFormat.jpeg,
@@ -65,6 +65,11 @@ class CompressionHelper {
     return compressedFile;
   }
 
+  /// remove all cache and temporary files.
+  ///
+  /// ```
+  /// CompressionHelper.cleanCache();
+  /// ```
   static Future<void> cleanCache() async {
     try {
       final dir = Directory(await getTempDir());
