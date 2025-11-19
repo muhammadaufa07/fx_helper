@@ -43,9 +43,6 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
 
   @override
   void initState() {
-    if (widget.allowDownload == true) {
-      assert(widget.onDownloadFileName?.isNotEmpty ?? false, "DownloadFileName is Required");
-    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {});
     });
@@ -80,7 +77,7 @@ class _ViewPdfPageState extends State<ViewPdfPage> {
       if (pdfBytes != null) {
         await Printing.layoutPdf(
           onLayout: (PdfPageFormat format) async => pdfBytes!,
-          name: widget.onDownloadFileName ?? "",
+          name: widget.onDownloadFileName ?? widget.title ?? "file",
         );
       } else {
         SnackbarHelper.showSnackBar(SnackbarState.warning, "Could not read pdf");
