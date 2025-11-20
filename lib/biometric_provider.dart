@@ -18,91 +18,118 @@ class BiometricProvider extends ChangeNotifier {
   late final LocalAuthentication auth;
 
   BiometricProvider() {
-    isLoading = true;
-    auth = LocalAuthentication();
-    _checkBiometric();
-    isLoading = false;
-    notifyListeners();
+    try {
+      isLoading = true;
+      auth = LocalAuthentication();
+      _checkBiometric();
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Future<bool> isEnabled() async {
-    isBioEnabled = await SecureStorage().getAllowBiometricLogin();
+    try {
+      isBioEnabled = await SecureStorage().getAllowBiometricLogin();
+    } catch (e) {
+      print(e.toString());
+    }
     return isBioEnabled;
   }
 
   Future<bool> _isSupported() async {
-    final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
-    print("canAuthenticateWithBiometrics: $canAuthenticateWithBiometrics");
-    final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
-    _isBioSupported = canAuthenticate;
-
-    return canAuthenticate;
+    try {
+      final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+      print("canAuthenticateWithBiometrics: $canAuthenticateWithBiometrics");
+      _isBioSupported = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+    } catch (e) {
+      print(e.toString());
+    }
+    return _isBioSupported;
   }
 
   void _checkBiometric() async {
-    isBioEnabled = await isEnabled();
-    _isBioSupported = await _isSupported();
-    _checkAllowLoginWithBiometric();
+    try {
+      isBioEnabled = await isEnabled();
+      _isBioSupported = await _isSupported();
+      _checkAllowLoginWithBiometric();
 
-    print("===");
-    print("isBiometricSupported : $_isBioSupported");
-    print("isBiometricEnabled : $isBioEnabled");
-    notifyListeners();
+      print("===");
+      print("isBiometricSupported : $_isBioSupported");
+      print("isBiometricEnabled : $isBioEnabled");
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   void changeBiometric({bool? isEnabled}) async {
     isLoading = true;
     notifyListeners();
-    _checkBiometric();
-    if (isEnabled ?? !isBioEnabled) {
-      bool isSuccess = await authenticate();
-      if (isSuccess) {
+    try {
+      _checkBiometric();
+      if (isEnabled ?? !isBioEnabled) {
+        bool isSuccess = await authenticate();
+        if (isSuccess) {
+          var currentSetting = await this.isEnabled();
+          await SecureStorage().setAllowBiometricLogin(isEnabled ?? !currentSetting);
+        } else {
+          SnackbarHelper.showSnackBar(SnackbarState.warning, "Authentikasi Gagal");
+        }
+      } else {
         var currentSetting = await this.isEnabled();
         await SecureStorage().setAllowBiometricLogin(isEnabled ?? !currentSetting);
-      } else {
-        SnackbarHelper.showSnackBar(SnackbarState.warning, "Authentikasi Gagal");
       }
-    } else {
-      var currentSetting = await this.isEnabled();
-      await SecureStorage().setAllowBiometricLogin(isEnabled ?? !currentSetting);
+      _checkBiometric();
+    } catch (e) {
+      print(e.toString());
     }
-    _checkBiometric();
     isLoading = false;
     notifyListeners();
   }
 
   Future<bool> _checkAllowLoginWithBiometric() async {
-    // String email = await SecureStorage().getBiometricEmail();
-    // String password = await SecureStorage().getBiometricPassword();
-    // bool isEmailPassCorrect =
-    //     ValidatorHelper.validateEmail(email) == null && ValidatorHelper.validatePassword(password) == null;
-    allowLoginWithBiometric = await _isSupported() && await isEnabled();
+    try {
+      // String email = await SecureStorage().getBiometricEmail();
+      // String password = await SecureStorage().getBiometricPassword();
+      // bool isEmailPassCorrect =
+      //     ValidatorHelper.validateEmail(email) == null && ValidatorHelper.validatePassword(password) == null;
+      allowLoginWithBiometric = await _isSupported() && await isEnabled();
+    } catch (e) {
+      print(e.toString());
+    }
+
     return allowLoginWithBiometric;
   }
 
   Future<bool> setBiometricLoginData({String? currentLoginEmail, String? currentLoginPassword}) async {
-    String oldEmail = await SecureStorage().getBiometricEmail();
-    String oldPassword = await SecureStorage().getBiometricPassword();
+    try {
+      String oldEmail = await SecureStorage().getBiometricEmail();
+      String oldPassword = await SecureStorage().getBiometricPassword();
 
-    if (await isEnabled() &&
-        (oldEmail.isEmpty ||
-            oldPassword.isEmpty ||
-            currentLoginEmail == null ||
-            currentLoginEmail.isEmpty ||
-            currentLoginPassword == null ||
-            currentLoginPassword.isEmpty ||
-            oldEmail != currentLoginEmail ||
-            oldPassword != currentLoginPassword)) {
-      await SecureStorage().setAllowBiometricLogin(false);
-      await _checkAllowLoginWithBiometric();
-      SnackbarHelper.showSnackBar(
-        SnackbarState.success,
-        "To protect your privacy, we have cleared previous biometric login. You can reactivate this feature from settings",
-        duration: Duration(seconds: 10),
-      );
+      if (await isEnabled() &&
+          (oldEmail.isEmpty ||
+              oldPassword.isEmpty ||
+              currentLoginEmail == null ||
+              currentLoginEmail.isEmpty ||
+              currentLoginPassword == null ||
+              currentLoginPassword.isEmpty ||
+              oldEmail != currentLoginEmail ||
+              oldPassword != currentLoginPassword)) {
+        await SecureStorage().setAllowBiometricLogin(false);
+        await _checkAllowLoginWithBiometric();
+        SnackbarHelper.showSnackBar(
+          SnackbarState.success,
+          "To protect your privacy, we have cleared previous biometric login. You can reactivate this feature from settings",
+          duration: Duration(seconds: 10),
+        );
+      }
+      await SecureStorage().setBiometricEmail(currentLoginEmail ?? "");
+      await SecureStorage().setBiometricPassword(currentLoginPassword ?? "");
+    } catch (e) {
+      print(e.toString());
     }
-    await SecureStorage().setBiometricEmail(currentLoginEmail ?? "");
-    await SecureStorage().setBiometricPassword(currentLoginPassword ?? "");
+
     return allowLoginWithBiometric;
   }
 
