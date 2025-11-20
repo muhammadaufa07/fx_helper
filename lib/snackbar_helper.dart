@@ -54,7 +54,7 @@ class SnackbarHelper {
   static void showSnackBar(
     SnackbarState state,
     String message, {
-    bool showButton = false,
+    // bool showButton = false,
     String? buttonTitle,
     Function()? onTap,
     Duration? duration,
@@ -70,7 +70,7 @@ class SnackbarHelper {
           Expanded(
             child: Text(message, style: TextStyle(color: _getTextColor(state))),
           ),
-          showButton
+          onTap != null
               ? ElevatedButton(
                   onPressed: onTap,
                   style: ButtonStyle(
