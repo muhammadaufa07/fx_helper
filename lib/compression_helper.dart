@@ -1,27 +1,9 @@
 import 'dart:io';
 import 'dart:math';
-
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:fx_helper/storage_helper.dart';
 
 class CompressionHelper {
-  static Future<String> getTempDir() async {
-    Directory? tmpDir;
-    try {
-      Directory rootTmpDir = await getTemporaryDirectory();
-      tmpDir = Directory("${rootTmpDir.path}/FxHelper/compression");
-      if (!tmpDir.existsSync()) {
-        print("Target dir not exist");
-        tmpDir.createSync(recursive: true);
-        print("${tmpDir.path} created!");
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-
-    return tmpDir?.path ?? "";
-  }
-
   static String _genRandFileName() {
     DateTime time = DateTime.now();
     return "${time.microsecondsSinceEpoch}-${Random().nextInt(999999)}";
@@ -41,7 +23,7 @@ class CompressionHelper {
     late File? compressedFile;
     try {
       /* New File Temp */
-      var tempDir = await getTempDir();
+      var tempDir = await StorageHelper.getTempDir("compression");
       String fileName = _genRandFileName();
 
       final String targetPath =
@@ -72,7 +54,7 @@ class CompressionHelper {
   /// ```
   static Future<void> cleanCache() async {
     try {
-      final dir = Directory(await getTempDir());
+      final dir = Directory(await StorageHelper.getTempDir("compression"));
       List<FileSystemEntity> files = await dir.list().toList();
       for (FileSystemEntity e in files) {
         print("DELETED CACHE: ${e.path}");

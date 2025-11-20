@@ -46,11 +46,16 @@ import 'package:http/http.dart' as http;
    /// res = await Network().get(Net.gateway, url)
  */
 
-abstract class FxNetwork {
+class FxNetwork {
   const FxNetwork();
-  // bool get isDevMode;
-  Map<String, String> getHeader();
-  String getDomainName(FxNet net);
+
+  Map<String, String> getHeader() {
+    throw UnimplementedError();
+  }
+
+  String getDomainName(FxNet net) {
+    throw UnimplementedError();
+  }
 
   MediaType _getMime(String fileExtensions) {
     fileExtensions = fileExtensions.toLowerCase();
@@ -98,6 +103,18 @@ abstract class FxNetwork {
     String uriStr = getDomainName(net) + path;
     Uri uri = Uri.parse(uriStr);
     return await http.get(uri, headers: getHeader()).timeout(Duration(seconds: 5));
+  }
+
+  /// Create a GET Request
+  ///
+  /// ```
+  /// Examples:
+  ///     get("https://somewhere/api/data"");
+  /// ```
+  Future<http.Response> getGlobal(String fullPath, {Map<String, String>? headers}) async {
+    String uriStr = fullPath;
+    Uri uri = Uri.parse(uriStr);
+    return await http.get(uri, headers: headers).timeout(Duration(seconds: 5));
   }
 
   /// Create a POST Request
