@@ -49,7 +49,7 @@ class BiometricProvider extends ChangeNotifier {
     return _isBioSupported;
   }
 
-  void _checkBiometric() async {
+  Future<void> _checkBiometric() async {
     try {
       isBioEnabled = await isEnabled();
       _isBioSupported = await _isSupported();
@@ -63,11 +63,12 @@ class BiometricProvider extends ChangeNotifier {
     }
   }
 
-  void changeBiometric({bool? isEnabled}) async {
+  Future<void> changeBiometric({bool? isEnabled}) async {
+    print("changeBiometric()");
     isLoading = true;
     notifyListeners();
     try {
-      _checkBiometric();
+      await _checkBiometric();
       if (isEnabled ?? !isBioEnabled) {
         bool isSuccess = await authenticate();
         if (isSuccess) {
@@ -80,12 +81,13 @@ class BiometricProvider extends ChangeNotifier {
         var currentSetting = await this.isEnabled();
         await SecureStorage().setAllowBiometricLogin(isEnabled ?? !currentSetting);
       }
-      _checkBiometric();
+      await _checkBiometric();
     } catch (e) {
       print(e.toString());
     }
     isLoading = false;
     notifyListeners();
+    print("changeBiometric() done");
   }
 
   Future<bool> _checkAllowLoginWithBiometric() async {
