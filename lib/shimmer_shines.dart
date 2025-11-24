@@ -20,7 +20,7 @@ class ShimmerShines extends StatelessWidget {
 
   /// Determines whether the shimmer effect should be shown (`true`) or
   /// the actual [child] should be displayed (`false`).
-  final bool isLoading;
+  final bool isVisible;
 
   /// The border radius of the shimmer container.
   final BorderRadius? borderRadius;
@@ -44,13 +44,13 @@ class ShimmerShines extends StatelessWidget {
     this.minHeight,
     this.minWidth,
     this.borderRadius,
-    required this.isLoading,
+    required this.isVisible,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
+    return isVisible
         ? Stack(
             children: [
               Opacity(opacity: 1, child: child),
