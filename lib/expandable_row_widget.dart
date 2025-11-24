@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:fx_helper/shimmer_rectangle.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ExpandableRowWidget<T> extends StatelessWidget {
+class ExpandableRowWidget<T> extends StatefulWidget {
   final String title;
   final TextStyle? titleStyle;
   final String? subtitle;
   final TextStyle? subtitleStyle;
-  final bool isExpanded;
   final bool isLoading;
   final VoidCallback onTap;
   final BoxDecoration? decoration;
@@ -18,14 +17,12 @@ class ExpandableRowWidget<T> extends StatelessWidget {
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
   final Function(int index, T item)? onChildItemTap;
   final EdgeInsets? padding;
-
   const ExpandableRowWidget({
     super.key,
     required this.title,
     this.titleStyle,
     this.subtitle,
     this.subtitleStyle,
-    required this.isExpanded,
     required this.isLoading,
     required this.onTap,
     required this.childItems,
@@ -39,6 +36,13 @@ class ExpandableRowWidget<T> extends StatelessWidget {
   });
 
   @override
+  _ExpandableRowWidgetState createState() => _ExpandableRowWidgetState();
+}
+
+class _ExpandableRowWidgetState extends State<ExpandableRowWidget> {
+  bool isExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -46,26 +50,26 @@ class ExpandableRowWidget<T> extends StatelessWidget {
           duration: const Duration(seconds: 1),
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
-            color: decoration?.color ?? Colors.white,
-            borderRadius: decoration?.borderRadius ?? BorderRadius.circular(10),
-            border: decoration?.border ?? Border.all(color: Colors.grey.shade300),
+            color: widget.decoration?.color ?? Colors.white,
+            borderRadius: widget.decoration?.borderRadius ?? BorderRadius.circular(10),
+            border: widget.decoration?.border ?? Border.all(color: Colors.grey.shade300),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ShimmerRectangle(
-                isLoading: isLoading,
+                isLoading: widget.isLoading,
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
                 child: ListTile(
-                  contentPadding: padding ?? EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: leadingIcon,
-                  title: Text(title, style: titleStyle ?? TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: subtitle == null
+                  contentPadding: widget.padding ?? EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: widget.leadingIcon,
+                  title: Text(widget.title, style: widget.titleStyle ?? TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: widget.subtitle == null
                       ? null
                       : Text(
-                          subtitle ?? "",
+                          widget.subtitle ?? "",
                           style:
-                              subtitleStyle ??
+                              widget.subtitleStyle ??
                               GoogleFonts.inter(
                                 fontWeight: FontWeight.normal,
                                 color: Colors.black,
@@ -74,7 +78,10 @@ class ExpandableRowWidget<T> extends StatelessWidget {
                               ),
                         ),
                   trailing: Icon(isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: Colors.black),
-                  onTap: onTap,
+                  onTap: () {
+                    isExpanded = !isExpanded;
+                    setState(() {});
+                  },
                 ),
               ),
               _listItem(context),
@@ -96,34 +103,34 @@ class ExpandableRowWidget<T> extends StatelessWidget {
           ? Container(
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                color: subDecoration?.color ?? Colors.grey.shade50,
+                color: widget.subDecoration?.color ?? Colors.grey.shade50,
                 borderRadius:
-                    subDecoration?.borderRadius ??
+                    widget.subDecoration?.borderRadius ??
                     BorderRadius.only(
                       /*  */
                       bottomLeft: Radius.circular(10),
                       bottomRight: Radius.circular(10),
                     ),
-                border: subDecoration?.border,
+                border: widget.subDecoration?.border,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: childItems.map((item) {
+                children: widget.childItems.map((item) {
                   return Material(
                     clipBehavior: Clip.antiAlias,
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: onChildItemTap == null
+                      onTap: widget.onChildItemTap == null
                           ? null
                           : () {
-                              onChildItemTap!(index, item);
+                              widget.onChildItemTap!(index, item);
                             },
                       child: Container(
-                        padding: subPadding ?? EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        padding: widget.subPadding ?? EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                         child: ShimmerRectangle(
-                          isLoading: isLoading,
+                          isLoading: widget.isLoading,
                           borderRadius: BorderRadius.circular(10),
-                          child: itemBuilder(context, item, index++),
+                          child: widget.itemBuilder(context, item, index++),
                         ),
                       ),
                     ),
