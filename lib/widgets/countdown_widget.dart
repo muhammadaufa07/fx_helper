@@ -39,7 +39,7 @@ class _CountdownWidgetState extends State<CountdownWidget> {
   void _initTime() {
     isEnded = false;
     Duration d = DateTime.now().difference(widget.endTime ?? DateTime.now());
-    if (d.isNegative) {
+    if (d.isNegative && d.inSeconds != 0) {
       timer = Timer.periodic(Duration(seconds: 1), (timer) {
         Duration d = DateTime.now().difference(widget.endTime ?? DateTime.now());
         print(d);
@@ -47,7 +47,7 @@ class _CountdownWidgetState extends State<CountdownWidget> {
           timeStr = DateTime.now().timeUntil(until: widget.endTime);
         } else {
           isEnded = true;
-          timeStr = "ended";
+          timeStr = "Ended";
           if (widget.onEnded != null) {
             widget.onEnded!();
           }
@@ -59,6 +59,7 @@ class _CountdownWidgetState extends State<CountdownWidget> {
     } else {
       isEnded = true;
       timeStr = "ended";
+      setState(() {});
     }
   }
 
@@ -83,7 +84,6 @@ class _CountdownWidgetState extends State<CountdownWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("build( isEnded: $isEnded | timeStr: $timeStr | timer: ${timer?.isActive})");
     if (widget.builder != null) {
       return widget.builder!(timeStr, isEnded);
     }
@@ -98,7 +98,6 @@ class _CountdownWidgetState extends State<CountdownWidget> {
 
   @override
   void dispose() {
-    print("disposed");
     timer?.cancel();
 
     super.dispose();
