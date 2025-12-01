@@ -1,6 +1,6 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:fx_helper/in_app_notification.dart';
+import 'package:fx_helper/canvas/in_app_notification.dart';
 
 /// A global key for showing SnackBars across the entire app
 /// using [SnackbarHelper.showSnackBar].

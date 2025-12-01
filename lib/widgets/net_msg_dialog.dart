@@ -74,7 +74,7 @@ class NetMsgDialog {
       );
       widgetInView = false;
     } else {
-      SnackbarHelper.showSnackBar(SnackbarState.warning, e.toString() ?? "");
+      SnackbarHelper.showSnackBar(SnackbarState.warning, e.toString());
     }
   }
 }

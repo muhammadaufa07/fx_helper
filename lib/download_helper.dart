@@ -6,7 +6,6 @@ import 'package:fx_helper/network/fx_network.dart';
 import 'package:fx_helper/snackbar_helper.dart';
 import 'package:fx_helper/storage_helper.dart';
 import 'package:fx_helper/widgets/net_msg_dialog.dart';
-import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
 import 'package:open_file_manager/open_file_manager.dart';
 // import 'package:path_provider/path_provider.dart';
