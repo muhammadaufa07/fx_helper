@@ -41,62 +41,68 @@ class DropdownCustom<T> extends StatelessWidget {
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-        /*  */
         color: backgroundColor ?? Colors.white,
-        borderRadius: borderRadius ?? BorderRadius.circular(roundedEdge),
+        borderRadius: borderRadius ?? BorderRadius.zero,
       ),
-      child: InkWell(
-        onTap: () {},
-        child: DropdownButtonFormField<T>(
-          isExpanded: true,
-          items: items
-              .map(
-                (e) => DropdownMenuItem<T>(
-                  value: e,
-                  child: Text(
-                    itemToString(e),
-                    style:
-                        textStyle ??
-                        textStyleTiny(context).copyWith(color: onChanged != null ? Colors.black : Colors.grey),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {},
+          child: DropdownButtonFormField<T>(
+            isExpanded: true,
+            items: items
+                .map(
+                  (e) => DropdownMenuItem<T>(
+                    value: e,
+                    child: Text(
+                      itemToString(e),
+                      textAlign: TextAlign.start,
+                      // maxLines: 1,
+                      style:
+                          textStyle ??
+                          textStyleTiny(context).copyWith(color: onChanged != null ? Colors.black : Colors.grey),
+                    ),
                   ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-          initialValue: value,
+                )
+                .toList(),
+            onChanged: onChanged,
+            initialValue: value,
+            barrierDismissible: true,
 
-          hint: Text(label, style: textStyleTiny(context).copyWith(color: greyColor)),
-          validator: validator,
-          icon: Icon(Icons.keyboard_arrow_down),
+            hint: Text(label, style: textStyleTiny(context).copyWith(color: greyColor)),
+            validator: validator,
+            icon: Icon(Icons.keyboard_arrow_down),
 
-          dropdownColor: Colors.white,
-          borderRadius: contentBorderRadius ?? BorderRadius.circular(roundedEdge * 1),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.transparent,
-            isDense: true,
-            contentPadding: padding ?? EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-            errorStyle: textStyleTiny(context).copyWith(color: Colors.red),
+            dropdownColor: Colors.white,
+            borderRadius: contentBorderRadius ?? BorderRadius.zero,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.transparent,
+              // fillColor: Colors.transparent,
+              isDense: true,
+              contentPadding: padding ?? EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              errorStyle: textStyleTiny(context).copyWith(color: Colors.red),
 
-            border: OutlineInputBorder(
-              borderRadius: borderRadius ?? BorderRadius.circular(roundedEdge),
-              borderSide: BorderSide(color: greyColor),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: borderRadius ?? BorderRadius.circular(roundedEdge),
-              borderSide: BorderSide(color: lightGreyColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: borderRadius ?? BorderRadius.circular(roundedEdge),
-              borderSide: BorderSide(color: greyColor),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: borderRadius ?? BorderRadius.circular(roundedEdge),
-              borderSide: BorderSide(color: Colors.red),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: borderRadius ?? BorderRadius.circular(roundedEdge),
-              borderSide: BorderSide(color: Colors.red),
+              border: OutlineInputBorder(
+                borderRadius: borderRadius ?? BorderRadius.zero,
+                borderSide: BorderSide(color: greyColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: borderRadius ?? BorderRadius.zero,
+                borderSide: BorderSide(color: lightGreyColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: borderRadius ?? BorderRadius.zero,
+                borderSide: BorderSide(color: greyColor),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: borderRadius ?? BorderRadius.zero,
+                borderSide: BorderSide(color: Colors.red),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: borderRadius ?? BorderRadius.zero,
+                borderSide: BorderSide(color: Colors.red),
+              ),
             ),
           ),
         ),
