@@ -42,7 +42,7 @@ class _CountdownWidgetState extends State<CountdownWidget> {
     if (d.isNegative && d.inSeconds != 0) {
       timer = Timer.periodic(Duration(seconds: 1), (timer) {
         Duration d = DateTime.now().difference(widget.endTime ?? DateTime.now());
-        print(d);
+        // print(d);
         if (d.isNegative) {
           timeStr = DateTime.now().timeUntil(until: widget.endTime);
         } else {
