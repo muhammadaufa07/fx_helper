@@ -5,12 +5,20 @@ class ScreenshotHelper {
   static final _noScreenshot = NoScreenshot.instance;
 
   static Future<void> disable() async {
-    bool result = await _noScreenshot.screenshotOff();
-    log("Screenshot is ${result ? "Enabled" : "Disabled"}");
+    try {
+      bool result = await _noScreenshot.screenshotOff();
+      log("Screenshot is Disabled [${result ? "success" : "failed"}]");
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   static Future<void> enable() async {
-    bool result = await _noScreenshot.screenshotOff();
-    log("Screenshot is ${result ? "Enabled" : "Disabled"}");
+    try {
+      bool result = await _noScreenshot.screenshotOff();
+      log("Screenshot is Enabled [${result ? "success" : "failed"}]");
+    } catch (e) {
+      log("Screenshot is Enabled");
+    }
   }
 }
