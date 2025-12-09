@@ -1,3 +1,6 @@
+// ignore_for_file: empty_catches
+
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -9,9 +12,9 @@ abstract class FxNetwork<T> {
   dynamic get env;
   bool get showFullLog;
 
-  int get getTimeOut => 10;
-  int get postTimeOut => 10;
-  int get postMultipartTimeOut => 30;
+  int get getTimeOut => 20;
+  int get postTimeOut => 20;
+  int get postMultipartTimeOut => 60;
 
   /* Token */
   String? _token;
@@ -66,6 +69,7 @@ abstract class FxNetwork<T> {
         return MediaType("text", "plain");
     }
   }
+  /* ==== ==== ==== GET ==== ==== ==== */
 
   /// Create a GET Request
   ///
@@ -74,9 +78,16 @@ abstract class FxNetwork<T> {
   ///     get(Net.gateway, url: "home/menu");
   /// ```
 
-  Future<http.Response> get(T net, String path, {int? timeout, bool? debug}) async {
+  Future<http.Response> get(
+    /*  */
+    T net,
+    String path, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
     String uriStr = getDomainName(net) + path;
-    return await getGlobal(uriStr, headers: getHeader(), timeout: timeout, debug: debug);
+    return await getGlobal(uriStr, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
   }
 
   /// Create a GET Request
@@ -85,15 +96,31 @@ abstract class FxNetwork<T> {
   /// Examples:
   ///     get("https://somewhere/api/data"");
   /// ```
-  Future<http.Response> getGlobal(String fullPath, {Map<String, String>? headers, int? timeout, bool? debug}) async {
-    http.Response res;
+  Future<http.Response> getGlobal(
+    /*  */
+    String fullPath, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
+    http.Response? res;
     String uriStr = fullPath;
     Uri uri = Uri.parse(uriStr);
-    res = await http.get(uri, headers: headers).timeout(Duration(seconds: timeout ?? getTimeOut));
-    _logSimple(fullPath, res, debug: debug);
+    res = await http
+        .get(uri, headers: headers)
+        .timeout(
+          Duration(seconds: timeout ?? getTimeOut),
+          onTimeout: () =>
+              http.Response("", 408, reasonPhrase: "Timeout: Could not connect to server ${timeout ?? getTimeOut}"),
+        );
+
+    _logSimple(fullPath, res, headers: headers, debug: debug);
+    if (res.statusCode == 408) throw TimeoutException(res.reasonPhrase);
 
     return res;
   }
+
+  /* ==== ==== ==== POST ==== ==== ==== */
 
   /// Create a POST Request
   ///
@@ -103,17 +130,37 @@ abstract class FxNetwork<T> {
   ///     post(Net.gateway, postData)
   /// ```
 
-  Future<http.Response> post(T net, String path, Map<String, dynamic> postData, {int? timeout}) async {
+  Future<http.Response> post(
+    /*  */
+    T net,
+    String path,
+    Map<String, dynamic> postData, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
     String uriStr = getDomainName(net) + path;
-    return await postGlobal(uriStr, postData, timeout: timeout);
+    return await postGlobal(uriStr, postData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
   }
 
-  Future<http.Response> postGlobal(String fullPath, Map<String, dynamic> postData, {int? timeout}) async {
+  Future<http.Response> postGlobal(
+    String fullPath,
+    Map<String, dynamic> postData, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
     http.Response res;
     res = await http
-        .post(Uri.parse(fullPath), body: jsonEncode(postData), headers: getHeader())
-        .timeout(Duration(seconds: timeout ?? postTimeOut));
-    _logSimple(fullPath, res, postData: postData);
+        .post(Uri.parse(fullPath), body: jsonEncode(postData), headers: headers)
+        .timeout(
+          Duration(seconds: timeout ?? postTimeOut),
+          onTimeout: () =>
+              http.Response("", 408, reasonPhrase: "Timeout: Could not connect to server ${timeout ?? getTimeOut}"),
+        );
+    _logSimple(fullPath, res, postData: postData, headers: headers, debug: debug);
+    if (res.statusCode == 408) throw TimeoutException(res.reasonPhrase);
+
     return res;
   }
 
@@ -136,17 +183,28 @@ abstract class FxNetwork<T> {
     String path,
     Map<String, String> postData,
     List<MultipartFormItem> files, {
+    Map<String, String>? headers,
     int? timeout,
+    bool? debug,
   }) async {
     String uriStr = getDomainName(net) + path;
-    return await postMultipartGlobal(uriStr, postData, files, timeout: timeout);
+    return await postMultipartGlobal(
+      uriStr,
+      postData,
+      files,
+      headers: headers ?? getHeader(),
+      timeout: timeout,
+      debug: debug,
+    );
   }
 
   Future<http.Response> postMultipartGlobal(
     String fullPath,
     Map<String, String> postData,
     List<MultipartFormItem> files, {
+    Map<String, String>? headers,
     int? timeout,
+    bool? debug,
   }) async {
     List<http.MultipartFile> multipartFiles = [];
 
@@ -162,53 +220,222 @@ abstract class FxNetwork<T> {
       );
     }
     var request = http.MultipartRequest('POST', Uri.parse(fullPath));
-    request.headers.addAll(getHeader());
+    if (headers != null) request.headers.addAll(headers);
     request.fields.addAll(postData);
     request.files.addAll(multipartFiles);
-    var response = await request.send().timeout(Duration(seconds: timeout ?? postMultipartTimeOut));
+    var response = await request.send().timeout(
+      Duration(seconds: timeout ?? postMultipartTimeOut),
+      onTimeout: () {
+        return http.StreamedResponse(
+          Stream.empty(),
+          408,
+          reasonPhrase: "Timeout: Could not connect to server ${timeout ?? getTimeOut}",
+        );
+      },
+    );
     http.Response res;
     res = await http.Response.fromStream(response);
-    _logSimple(fullPath, res, postData: postData, multipartFiles: multipartFiles);
+
+    _logSimple(fullPath, res, postData: postData, multipartFiles: multipartFiles, headers: headers, debug: debug);
+    if (res.statusCode == 408) throw TimeoutException(res.reasonPhrase);
+
     return res;
   }
 
+  /* ==== ==== ==== DELETE ==== ==== ==== */
+  /// Create a DELETE Request
+  ///
+  /// ```
+  /// Examples:
+  ///     delete("https://somewhere/api/data?id=1"");
+  /// ```
+  Future<http.Response> delete(
+    /*  */
+    T net,
+    String path, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
+    String uriStr = getDomainName(net) + path;
+    return await deleteGlobal(uriStr, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
+  }
+
+  Future<http.Response> deleteGlobal(
+    /*  */
+    String fullPath, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
+    http.Response? res;
+    String uriStr = fullPath;
+    Uri uri = Uri.parse(uriStr);
+    res = await http
+        .delete(uri, headers: headers)
+        .timeout(
+          Duration(seconds: timeout ?? getTimeOut),
+          onTimeout: () =>
+              http.Response("", 408, reasonPhrase: "Timeout: Could not connect to server ${timeout ?? getTimeOut}"),
+        );
+
+    _logSimple(fullPath, res, headers: headers, debug: debug);
+    if (res.statusCode == 408) throw TimeoutException(res.reasonPhrase);
+
+    return res;
+  }
+
+  /* ==== ==== ==== PUT ==== ==== ==== */
+  Future<http.Response> put(
+    /*  */
+    T net,
+    String path,
+    Map<String, dynamic> putData, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
+    String uriStr = getDomainName(net) + path;
+    return await putGlobal(uriStr, putData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
+  }
+
+  Future<http.Response> putGlobal(
+    String fullPath,
+    Map<String, dynamic> putData, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
+    http.Response res;
+    res = await http
+        .put(Uri.parse(fullPath), body: jsonEncode(putData), headers: headers)
+        .timeout(Duration(seconds: timeout ?? postTimeOut));
+    _logSimple(fullPath, res, postData: putData, headers: headers, debug: debug);
+    return res;
+  }
+
+  Future<http.Response> putMultipart(
+    T net,
+    String path,
+    Map<String, String> putData,
+    List<MultipartFormItem> files, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
+    String uriStr = getDomainName(net) + path;
+    return await putMultipartGlobal(
+      uriStr,
+      putData,
+      files,
+      headers: headers ?? getHeader(),
+      timeout: timeout,
+      debug: debug,
+    );
+  }
+
+  Future<http.Response> putMultipartGlobal(
+    String fullPath,
+    Map<String, String> putData,
+    List<MultipartFormItem> files, {
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
+    List<http.MultipartFile> multipartFiles = [];
+
+    for (MultipartFormItem f in files) {
+      final fileName = f.file.path.split('/').last;
+      multipartFiles.add(
+        http.MultipartFile.fromBytes(
+          f.fieldName,
+          f.file.readAsBytesSync(),
+          filename: fileName,
+          contentType: _getMime(fileName.split(".").last),
+        ),
+      );
+    }
+    var request = http.MultipartRequest('PUT', Uri.parse(fullPath));
+    if (headers != null) request.headers.addAll(headers);
+    request.fields.addAll(putData);
+    request.files.addAll(multipartFiles);
+    var response = await request.send().timeout(
+      Duration(seconds: timeout ?? postMultipartTimeOut),
+      onTimeout: () {
+        return http.StreamedResponse(
+          Stream.empty(),
+          408,
+          reasonPhrase: "Timeout: Could not connect to server ${timeout ?? getTimeOut}",
+        );
+      },
+    );
+    http.Response res;
+    res = await http.Response.fromStream(response);
+    _logSimple(fullPath, res, postData: putData, multipartFiles: multipartFiles, headers: headers, debug: debug);
+    if (res.statusCode == 408) throw TimeoutException(res.reasonPhrase);
+    return res;
+  }
+  /* ==== ==== ==== LOG ==== ==== ==== */
+
   void _logSimple(
     String fullPath,
-    http.Response res, {
+    http.Response? res, {
     Map<String, dynamic>? postData,
     List<http.MultipartFile>? multipartFiles,
-    bool? debug,
+    bool? debug = false,
+    Map<String, String>? headers,
   }) {
     String t = "";
     try {
-      t +=
-          "${fullPath.padRight(fullPath.length > 100 ? fullPath.length : 80, " ")} -> ${jsonDecode(res.body)?["message"]}\n";
-    } catch (e) {}
+      t += fullPath.padRight(fullPath.length > 100 ? fullPath.length : 80, " ");
+      t += " -> ";
+      if (res?.reasonPhrase != null) t += "${res?.reasonPhrase ?? ""} | ";
+      if (res != null) t += jsonDecode(res.body)?["message"];
+      t += "\n";
+    } catch (e) {
+      // print(e.toString());
+    }
+    if (headers != null && ((debug ?? false) || showFullLog)) {
+      try {
+        t += JsonEncoder.withIndent("  ").convert(headers);
+        t += "\n";
+      } catch (e) {
+        // print(e.toString());
+      }
+    }
     if (postData != null) {
       try {
         t += JsonEncoder.withIndent("  ").convert(postData);
         t += "\n";
+      } catch (e) {
+        // print(e.toString());
+      }
+    }
+    if (multipartFiles != null) {
+      try {
+        List<Map<String, String>> f = [];
+        for (http.MultipartFile e in multipartFiles) {
+          f.add({
+            "Field": e.field,
+            "File-Name": e.filename.toString(),
+            "Type": e.contentType.type,
+            "Sub-Type": e.contentType.subtype,
+            "Mime-Type": e.contentType.mimeType,
+            "Content-Type": e.contentType.toString(),
+            "Length": "${(e.length)}B | ${(e.length / 1024)}KB | ${(e.length / 1024 / 1024)}MB",
+          });
+        }
+        log(JsonEncoder.withIndent("    ").convert(f));
       } catch (e) {}
     }
-    // if (multipartFiles != null) {
-    //   try {
-    //     List<Map<String, String>> f = [];
-    //     for (var element in multipartFiles) {
-    //       f.add({element.field: element.filename.toString()});
-    //     }
-    //     log(JsonEncoder.withIndent("    ").convert(f));
-    //   } catch (e) {}
-    // }
-    if (res.statusCode != 200 || showFullLog) {
+    if ((res != null && res.statusCode != 200) || (debug ?? false) || showFullLog) {
       try {
-        t += JsonEncoder.withIndent("  ").convert(jsonDecode(res.body));
+        if (res != null) t += JsonEncoder.withIndent("  ").convert(jsonDecode(res.body));
       } catch (e) {}
     }
     try {
-      log(t, name: res.statusCode.toString());
-    } catch (e) {
-      print(e.toString());
-    }
+      log(t, name: res?.statusCode.toString() ?? "error");
+    } catch (e) {}
   }
 }
 

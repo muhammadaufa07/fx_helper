@@ -1,6 +1,7 @@
 import 'package:fx_helper/formatter_helper.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:developer' as devl;
 
 /* 
   This Logger is supposed to be wrapper for logging library.
@@ -35,7 +36,8 @@ class LoggerHelper {
               } else {
                 lvl = record.level.name;
               }
-              print('$lvl: ${FormatterHelper.formatTimeWithSeconds(record.time)}: ${record.message}');
+              // print('$lvl: ${FormatterHelper.formatTimeWithSeconds(record.time)}: ${record.message}');
+              devl.log('$lvl: ${FormatterHelper.formatTimeWithSeconds(record.time)}: ${record.message}');
             }
           },
     );
@@ -47,6 +49,9 @@ class LoggerHelper {
     */
   void i(Object? message, [Object? error, StackTrace? stackTrace]) {
     log.info(message);
+    // devl.log(r"\\033[41mtest\\033[m", level: 1000);
+    // devl.log("test", level: 900);
+    // devl.log("test", level: 700);
   }
 
   /* 
