@@ -210,14 +210,24 @@ abstract class FxNetwork<T> {
 
     for (MultipartFormItem f in files) {
       final fileName = f.file.path.split('/').last;
-      multipartFiles.add(
-        http.MultipartFile.fromBytes(
-          f.fieldName,
-          f.file.readAsBytesSync(),
-          filename: fileName,
-          contentType: _getMime(fileName.split(".").last),
-        ),
+
+      final mfile = await http.MultipartFile.fromPath(
+        f.fieldName,
+        f.file.path,
+        filename: fileName,
+        contentType: _getMime(fileName.split(".").last),
       );
+      multipartFiles.add(mfile);
+
+      /* OLD */
+      // multipartFiles.add(
+      //   http.MultipartFile.fromBytes(
+      //     f.fieldName,
+      //     f.file.readAsBytesSync(),
+      //     filename: fileName,
+      //     contentType: _getMime(fileName.split(".").last),
+      //   ),
+      // );
     }
     var request = http.MultipartRequest('POST', Uri.parse(fullPath));
     if (headers != null) request.headers.addAll(headers);
@@ -346,14 +356,23 @@ abstract class FxNetwork<T> {
 
     for (MultipartFormItem f in files) {
       final fileName = f.file.path.split('/').last;
-      multipartFiles.add(
-        http.MultipartFile.fromBytes(
-          f.fieldName,
-          f.file.readAsBytesSync(),
-          filename: fileName,
-          contentType: _getMime(fileName.split(".").last),
-        ),
+      final mfile = await http.MultipartFile.fromPath(
+        f.fieldName,
+        f.file.path,
+        filename: fileName,
+        contentType: _getMime(fileName.split(".").last),
       );
+      multipartFiles.add(mfile);
+
+      /* OLD */
+      // multipartFiles.add(
+      //   http.MultipartFile.fromBytes(
+      //     f.fieldName,
+      //     f.file.readAsBytesSync(),
+      //     filename: fileName,
+      //     contentType: _getMime(fileName.split(".").last),
+      //   ),
+      // );
     }
     var request = http.MultipartRequest('PUT', Uri.parse(fullPath));
     if (headers != null) request.headers.addAll(headers);
