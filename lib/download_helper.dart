@@ -38,7 +38,7 @@ class DownloadHelper extends ChangeNotifier {
     File? file;
     try {
       SnackbarHelper.showSnackBar(SnackbarState.success, "Mendownload");
-      res = await FxNetworkLocal().getGlobal(path);
+      res = await FxNetworkLocal().getGlobal(Uri.parse(path));
       String ext = "";
       res.headers.forEach((key, value) {
         if (key == "content-type") {
