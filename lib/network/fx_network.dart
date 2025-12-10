@@ -4,38 +4,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:http/io_client.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
-
-/// Simple API exception container
-class ApiException implements Exception {
-  final int? statusCode;
-  final String message;
-  final dynamic body;
-  final Exception? underlying;
-
-  ApiException(this.message, {this.statusCode, this.body, this.underlying});
-
-  @override
-  String toString() => 'ApiException(status:$statusCode, message:$message)';
-}
-
-/*  */
-IOStreamedResponse _timeOutResponse({required String httpMethod, required String url}) {
-  final Map<String, dynamic> body = {'status': 408, 'message': 'Request Time Out'};
-  const int statusCode = 408;
-  final Uri destination = Uri.parse(url);
-  final String jsonBody = jsonEncode(body);
-
-  return IOStreamedResponse(
-    Stream.value(jsonBody.codeUnits),
-    statusCode,
-    request: http.Request(httpMethod, destination),
-    headers: {'content-type': 'application/json'},
-  );
-}
 
 abstract class FxNetwork<T> {
   final http.Client httpClient;
@@ -491,113 +462,30 @@ abstract class FxNetwork<T> {
     }
   }
 
-  /* ==== ==== Typed helpers ==== ==== */
+  IOStreamedResponse _timeOutResponse({required String httpMethod, required String url}) {
+    final Map<String, dynamic> body = {'status': 408, 'message': 'Request Time Out'};
+    const int statusCode = 408;
+    final Uri destination = Uri.parse(url);
+    final String jsonBody = jsonEncode(body);
 
-  /// Map http.Response to typed NetworkResponse<R>
-  // Future<NetworkResponse<R>> _mapResponse<R>({
-  //   required http.Response res,
-  //   R Function(dynamic decoded)? mapper,
-  //   Future<R> Function(dynamic decoded)? asyncMapper,
-  // }) async {
-  //   final status = res.statusCode;
-  //   dynamic decoded;
-  //   try {
-  //     decoded = res.body.isNotEmpty ? jsonDecode(res.body) : null;
-  //   } catch (_) {
-  //     decoded = res.body; // fallback raw
-  //   }
-
-  //   if (status >= 200 && status < 300) {
-  //     try {
-  //       if (asyncMapper != null) {
-  //         final mapped = await asyncMapper(decoded);
-  //         return NetworkResponse.success(mapped);
-  //       } else if (mapper != null) {
-  //         final mapped = mapper(decoded);
-  //         return NetworkResponse.success(mapped);
-  //       } else {
-  //         // no mapper provided, return decoded as R if possible
-  //         return NetworkResponse.success(decoded as R);
-  //       }
-  //     } catch (e) {
-  //       return NetworkResponse.failure(
-  //         ApiException(
-  //           'Mapping failed',
-  //           statusCode: status,
-  //           body: decoded,
-  //           underlying: e is Exception ? e : Exception(e.toString()),
-  //         ),
-  //       );
-  //     }
-  //   } else {
-  //     final message = (decoded is Map && decoded['message'] != null)
-  //         ? decoded['message'].toString()
-  //         : (res.reasonPhrase ?? 'HTTP $status');
-  //     return NetworkResponse.failure(ApiException(message, statusCode: status, body: decoded));
-  //   }
-  // }
-
-  /// Typed POST helper (JSON body)
-  // Future<NetworkResponse<R>> postTyped<R>(
-  //   String fullPath,
-  //   Map<String, dynamic> postData, {
-  //   Map<String, String>? headers,
-  //   int? timeout,
-  //   R Function(dynamic decoded)? mapper,
-  //   Future<R> Function(dynamic decoded)? asyncMapper,
-  //   bool? debug,
-  // }) async {
-  //   final merged = _mergeHeaders(headers, forMultipart: false);
-  //   final dTimeout = timeout ?? postTimeOut;
-  //   try {
-  //     final res = await httpClient
-  //         .post(Uri.parse(fullPath), body: jsonEncode(postData), headers: merged)
-  //         .timeout(
-  //           Duration(seconds: dTimeout),
-  //           onTimeout: () => http.Response("", 408, reasonPhrase: "Timeout: Could not connect to server $dTimeout"),
-  //         );
-
-  //     _logSimple(fullPath, res, postData: postData, headers: merged, debug: debug);
-  //     if (res.statusCode == 408) return NetworkResponse.failure(ApiException('Timeout', statusCode: 408));
-  //     return await _mapResponse<R>(res: res, mapper: mapper, asyncMapper: asyncMapper);
-  //   } catch (e) {
-  //     return NetworkResponse.failure(
-  //       ApiException('Network error: ${e.toString()}', underlying: e is Exception ? e : Exception(e.toString())),
-  //     );
-  //   }
-  // }
-
-  /// Typed GET helper
-  // Future<NetworkResponse<R>> getTyped<R>(
-  //   String fullPath, {
-  //   Map<String, String>? headers,
-  //   int? timeout,
-  //   R Function(dynamic decoded)? mapper,
-  //   Future<R> Function(dynamic decoded)? asyncMapper,
-  //   bool? debug,
-  // }) async {
-  //   final merged = _mergeHeaders(headers, forMultipart: false);
-  //   final dTimeout = timeout ?? getTimeOut;
-  //   try {
-  //     final res = await httpClient
-  //         .get(Uri.parse(fullPath), headers: merged)
-  //         .timeout(
-  //           Duration(seconds: dTimeout),
-  //           onTimeout: () => http.Response("", 408, reasonPhrase: "Timeout: Could not connect to server $dTimeout"),
-  //         );
-
-  //     _logSimple(fullPath, res, headers: merged, debug: debug);
-  //     if (res.statusCode == 408) return NetworkResponse.failure(ApiException('Timeout', statusCode: 408));
-  //     return await _mapResponse<R>(res: res, mapper: mapper, asyncMapper: asyncMapper);
-  //   } catch (e) {
-  //     return NetworkResponse.failure(
-  //       ApiException('Network error: ${e.toString()}', underlying: e is Exception ? e : Exception(e.toString())),
-  //     );
-  //   }
-  // }
+    return IOStreamedResponse(
+      Stream.value(jsonBody.codeUnits),
+      statusCode,
+      request: http.Request(httpMethod, destination),
+      headers: {'content-type': 'application/json'},
+    );
+  }
 }
 
 /* Utilities */
+class ApiException implements Exception {
+  final String? message;
+  const ApiException(this.message);
+
+  @override
+  String toString() => 'ApiException: $message';
+}
+
 class MultipartFormItem {
   File file;
   String fieldName;
