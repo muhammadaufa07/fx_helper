@@ -87,25 +87,25 @@ abstract class FxNetwork<T> {
 
   /// Merge base headers, runtime token and caller headers.
   /// If forMultipart==true, remove any Content-Type so MultipartRequest can set boundary.
-  Map<String, String> _mergeHeaders(Map<String, String>? headers, {bool forMultipart = false}) {
-    final Map<String, String> m = {};
-    try {
-      final base = getHeader();
-      if (base.isNotEmpty) m.addAll(base);
-    } catch (_) {}
-    if (_token != null && _token!.isNotEmpty) m['Authorization'] = 'Bearer $_token';
+  // Map<String, String> _mergeHeaders(Map<String, String>? headers, {bool forMultipart = false}) {
+  //   final Map<String, String> m = {};
+  //   try {
+  //     final base = getHeader();
+  //     if (base.isNotEmpty) m.addAll(base);
+  //   } catch (_) {}
+  //   if (_token != null && _token!.isNotEmpty) m['Authorization'] = 'Bearer $_token';
 
-    if (!forMultipart) {
-      // default application/json for regular body requests
-      m.putIfAbsent('Content-Type', () => 'application/json');
-    } else {
-      // For multipart, MultipartRequest will provide Content-Type with boundary; remove any JSON header
-      m.remove('Content-Type');
-    }
+  //   if (!forMultipart) {
+  //     // default application/json for regular body requests
+  //     m.putIfAbsent('Content-Type', () => 'application/json');
+  //   } else {
+  //     // For multipart, MultipartRequest will provide Content-Type with boundary; remove any JSON header
+  //     m.remove('Content-Type');
+  //   }
 
-    if (headers != null) m.addAll(headers);
-    return m;
-  }
+  //   if (headers != null) m.addAll(headers);
+  //   return m;
+  // }
 
   MediaType _getMime(String fileExtensions) {
     fileExtensions = fileExtensions.toLowerCase();
@@ -156,8 +156,9 @@ abstract class FxNetwork<T> {
     Uri fullPath = Uri.parse("${getDomainName(net)}$path");
     return await getGlobal(
       fullPath,
-      // params: params,
-      headers: _mergeHeaders(headers, forMultipart: false),
+      params: params,
+      // headers: _mergeHeaders(headers, forMultipart: false),
+      headers: headers ?? getHeader(),
       timeout: timeout,
       debug: debug,
     );
@@ -165,7 +166,7 @@ abstract class FxNetwork<T> {
 
   Future<http.Response> getGlobal(
     Uri fullPath, {
-    // Map<String, String>? params,
+    Map<String, String>? params,
     Map<String, String>? headers,
     int? timeout,
     bool? debug,
@@ -199,13 +200,7 @@ abstract class FxNetwork<T> {
     bool? debug,
   }) async {
     Uri fullPath = _buildUri(getDomainName(net), path);
-    return await postGlobal(
-      fullPath,
-      postData,
-      headers: _mergeHeaders(headers, forMultipart: false),
-      timeout: timeout,
-      debug: debug,
-    );
+    return await postGlobal(fullPath, postData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
   }
 
   Future<http.Response> postGlobal(
@@ -246,7 +241,7 @@ abstract class FxNetwork<T> {
       fullPath,
       postData,
       files,
-      headers: _mergeHeaders(headers, forMultipart: true),
+      headers: headers ?? getHeader(),
       timeout: timeout,
       debug: debug,
     );
@@ -302,12 +297,7 @@ abstract class FxNetwork<T> {
 
   Future<http.Response> delete(T net, String path, {Map<String, String>? headers, int? timeout, bool? debug}) async {
     Uri fullPath = _buildUri(getDomainName(net), path);
-    return await deleteGlobal(
-      fullPath,
-      headers: _mergeHeaders(headers, forMultipart: false),
-      timeout: timeout,
-      debug: debug,
-    );
+    return await deleteGlobal(fullPath, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
   }
 
   Future<http.Response> deleteGlobal(Uri fullPath, {Map<String, String>? headers, int? timeout, bool? debug}) async {
@@ -339,13 +329,7 @@ abstract class FxNetwork<T> {
     bool? debug,
   }) async {
     Uri fullPath = _buildUri(getDomainName(net), path);
-    return await putGlobal(
-      fullPath,
-      putData,
-      headers: _mergeHeaders(headers, forMultipart: false),
-      timeout: timeout,
-      debug: debug,
-    );
+    return await putGlobal(fullPath, putData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
   }
 
   Future<http.Response> putGlobal(
@@ -380,7 +364,7 @@ abstract class FxNetwork<T> {
       fullPath,
       putData,
       files,
-      headers: _mergeHeaders(headers, forMultipart: true),
+      headers: headers ?? getHeader(),
       timeout: timeout,
       debug: debug,
     );
