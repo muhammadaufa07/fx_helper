@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:http/io_client.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,18 +22,19 @@ class ApiException implements Exception {
   String toString() => 'ApiException(status:$statusCode, message:$message)';
 }
 
-/// Typed network response wrapper
-class NetworkResponse<R> {
-  final R? data;
-  final ApiException? error;
+/*  */
+IOStreamedResponse _timeOutResponse({required String httpMethod, required String url}) {
+  final Map<String, dynamic> body = {'status': 408, 'message': 'Request Time Out'};
+  const int statusCode = 408;
+  final Uri destination = Uri.parse(url);
+  final String jsonBody = jsonEncode(body);
 
-  const NetworkResponse._({this.data, this.error});
-
-  bool get isSuccess => error == null && data != null;
-  bool get isError => error != null;
-
-  factory NetworkResponse.success(R data) => NetworkResponse._(data: data);
-  factory NetworkResponse.failure(ApiException e) => NetworkResponse._(error: e);
+  return IOStreamedResponse(
+    Stream.value(jsonBody.codeUnits),
+    statusCode,
+    request: http.Request(httpMethod, destination),
+    headers: {'content-type': 'application/json'},
+  );
 }
 
 abstract class FxNetwork<T> {
@@ -62,50 +65,12 @@ abstract class FxNetwork<T> {
 
   String getDomainName(T net);
 
-  /// build uri safely combining base and path (handles absolute urls too)
-  Uri _buildUri(String base, String path, [Map<String, String>? queryParams]) {
-    if (path.startsWith('http://') || path.startsWith('https://')) return Uri.parse(path);
-
-    final combinedParams = Uri.parse(path).queryParameters;
-    if (queryParams != null) combinedParams.addAll(queryParams);
-    // final paramsFromPath = Uri.parse(path).path;
-    // print(Uri.parse(path).path);
-    // print(paramsFromPath);
-
-    final baseUri = Uri.parse(base);
-    final basePath = baseUri.path.endsWith('/') ? baseUri.path.substring(0, baseUri.path.length - 1) : baseUri.path;
-    final relPath = path.startsWith('/') ? path : '/$path';
-    final newPath = (basePath + relPath).replaceAll('//', '/');
-    print("baseUri: $baseUri");
-    print("newPath: $newPath");
-
-    final replaced = baseUri.replace(path: newPath, queryParameters: combinedParams);
-    print("replaced: $replaced");
-
-    return replaced;
+  Uri _buildUri(Uri path, [Map<String, String>? queryParams]) {
+    Map<String, String> p = {};
+    p.addAll(path.queryParameters);
+    if (queryParams != null) p.addAll(queryParams);
+    return path.replace(queryParameters: p);
   }
-
-  /// Merge base headers, runtime token and caller headers.
-  /// If forMultipart==true, remove any Content-Type so MultipartRequest can set boundary.
-  // Map<String, String> _mergeHeaders(Map<String, String>? headers, {bool forMultipart = false}) {
-  //   final Map<String, String> m = {};
-  //   try {
-  //     final base = getHeader();
-  //     if (base.isNotEmpty) m.addAll(base);
-  //   } catch (_) {}
-  //   if (_token != null && _token!.isNotEmpty) m['Authorization'] = 'Bearer $_token';
-
-  //   if (!forMultipart) {
-  //     // default application/json for regular body requests
-  //     m.putIfAbsent('Content-Type', () => 'application/json');
-  //   } else {
-  //     // For multipart, MultipartRequest will provide Content-Type with boundary; remove any JSON header
-  //     m.remove('Content-Type');
-  //   }
-
-  //   if (headers != null) m.addAll(headers);
-  //   return m;
-  // }
 
   MediaType _getMime(String fileExtensions) {
     fileExtensions = fileExtensions.toLowerCase();
@@ -152,12 +117,11 @@ abstract class FxNetwork<T> {
     int? timeout,
     bool? debug,
   }) async {
-    _buildUri(getDomainName(net), path, params);
     Uri fullPath = Uri.parse("${getDomainName(net)}$path");
     return await getGlobal(
+      /*  */
       fullPath,
       params: params,
-      // headers: _mergeHeaders(headers, forMultipart: false),
       headers: headers ?? getHeader(),
       timeout: timeout,
       debug: debug,
@@ -173,17 +137,19 @@ abstract class FxNetwork<T> {
   }) async {
     http.Response? res;
 
+    Uri newUri = _buildUri(fullPath, params);
+
     final dTimeout = timeout ?? getTimeOut;
     final merged = headers ?? {};
 
     res = await httpClient
-        .get(fullPath, headers: merged)
+        .get(newUri, headers: merged)
         .timeout(
           Duration(seconds: dTimeout),
           onTimeout: () => http.Response("", 408, reasonPhrase: "Timeout: Could not connect to server $dTimeout"),
         );
 
-    _logSimple(fullPath, res, headers: merged, debug: debug);
+    _logSimple(newUri, res, headers: merged, debug: debug);
     if (res.statusCode == 408) throw TimeoutException(res.reasonPhrase);
 
     return res;
@@ -199,7 +165,7 @@ abstract class FxNetwork<T> {
     int? timeout,
     bool? debug,
   }) async {
-    Uri fullPath = _buildUri(getDomainName(net), path);
+    Uri fullPath = Uri.parse("${getDomainName(net)}$path");
     return await postGlobal(fullPath, postData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
   }
 
@@ -236,7 +202,7 @@ abstract class FxNetwork<T> {
     int? timeout,
     bool? debug,
   }) async {
-    Uri fullPath = _buildUri(getDomainName(net), path);
+    Uri fullPath = Uri.parse("${getDomainName(net)}$path");
     return await postMultipartGlobal(
       fullPath,
       postData,
@@ -280,11 +246,7 @@ abstract class FxNetwork<T> {
         .send(request)
         .timeout(
           Duration(seconds: dTimeout),
-          onTimeout: () => http.StreamedResponse(
-            Stream.empty(),
-            408,
-            reasonPhrase: "Timeout: Could not connect to server $dTimeout",
-          ),
+          onTimeout: () => _timeOutResponse(httpMethod: "POST", url: fullPath.toString()),
         );
 
     final res = await http.Response.fromStream(streamed);
@@ -295,24 +257,45 @@ abstract class FxNetwork<T> {
 
   /* ==== ==== ==== DELETE ==== ==== ==== */
 
-  Future<http.Response> delete(T net, String path, {Map<String, String>? headers, int? timeout, bool? debug}) async {
-    Uri fullPath = _buildUri(getDomainName(net), path);
-    return await deleteGlobal(fullPath, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
+  Future<http.Response> delete(
+    /*  */
+    T net,
+    String path, {
+    Map<String, String>? params,
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
+    Uri fullPath = Uri.parse("${getDomainName(net)}$path");
+    return await deleteGlobal(
+      fullPath,
+      params: params,
+      headers: headers ?? getHeader(),
+      timeout: timeout,
+      debug: debug,
+    );
   }
 
-  Future<http.Response> deleteGlobal(Uri fullPath, {Map<String, String>? headers, int? timeout, bool? debug}) async {
+  Future<http.Response> deleteGlobal(
+    /*  */
+    Uri fullPath, {
+    Map<String, String>? params,
+    Map<String, String>? headers,
+    int? timeout,
+    bool? debug,
+  }) async {
     final dTimeout = timeout ?? getTimeOut;
     final merged = headers ?? {};
-    // final uri = Uri.parse(fullPath);
+    Uri newUri = _buildUri(fullPath, params);
 
     final res = await httpClient
-        .delete(fullPath, headers: merged)
+        .delete(newUri, headers: merged)
         .timeout(
           Duration(seconds: dTimeout),
           onTimeout: () => http.Response("", 408, reasonPhrase: "Timeout: Could not connect to server $dTimeout"),
         );
 
-    _logSimple(fullPath, res, headers: merged, debug: debug);
+    _logSimple(newUri, res, headers: merged, debug: debug);
     if (res.statusCode == 408) throw TimeoutException(res.reasonPhrase);
 
     return res;
@@ -328,7 +311,7 @@ abstract class FxNetwork<T> {
     int? timeout,
     bool? debug,
   }) async {
-    Uri fullPath = _buildUri(getDomainName(net), path);
+    Uri fullPath = Uri.parse("${getDomainName(net)}$path");
     return await putGlobal(fullPath, putData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
   }
 
@@ -359,7 +342,7 @@ abstract class FxNetwork<T> {
     int? timeout,
     bool? debug,
   }) async {
-    Uri fullPath = _buildUri(getDomainName(net), path);
+    Uri fullPath = Uri.parse("${getDomainName(net)}$path");
     return await putMultipartGlobal(
       fullPath,
       putData,
@@ -402,11 +385,7 @@ abstract class FxNetwork<T> {
         .send(request)
         .timeout(
           Duration(seconds: dTimeout),
-          onTimeout: () => http.StreamedResponse(
-            Stream.empty(),
-            408,
-            reasonPhrase: "Timeout: Could not connect to server $dTimeout",
-          ),
+          onTimeout: () => _timeOutResponse(httpMethod: "PUT", url: fullPath.toString()),
         );
 
     final res = await http.Response.fromStream(streamed);
