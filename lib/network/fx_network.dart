@@ -1,5 +1,3 @@
-// ignore_for_file: empty_catches
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -7,19 +5,33 @@ import 'dart:io';
 import 'package:http/io_client.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 
 abstract class FxNetwork<T> {
   final http.Client httpClient;
+  static PackageInfo? _packageInfo;
+  static PackageInfo? get packageInfo {
+    return _packageInfo;
+  }
+
+  Future<void> init() async {
+    try {
+      _packageInfo = await PackageInfo.fromPlatform();
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
   FxNetwork({http.Client? client}) : httpClient = client ?? http.Client();
 
   bool get isDevMode;
   dynamic get env;
   bool get showFullLog;
+  bool get logEnable => isDevMode;
 
   int get getTimeOut => 20;
   int get postTimeOut => 20;
   int get postMultipartTimeOut => 60;
-  int get maxLogBody => 4096;
 
   /* Token */
   String? _token;
@@ -217,7 +229,7 @@ abstract class FxNetwork<T> {
         .send(request)
         .timeout(
           Duration(seconds: dTimeout),
-          onTimeout: () => _timeOutResponse(httpMethod: "POST", url: fullPath.toString()),
+          onTimeout: () => _timeOutResponse(httpMethod: "POST", url: fullPath.toString(), timeout: dTimeout),
         );
 
     final res = await http.Response.fromStream(streamed);
@@ -356,7 +368,7 @@ abstract class FxNetwork<T> {
         .send(request)
         .timeout(
           Duration(seconds: dTimeout),
-          onTimeout: () => _timeOutResponse(httpMethod: "PUT", url: fullPath.toString()),
+          onTimeout: () => _timeOutResponse(httpMethod: "PUT", url: fullPath.toString(), timeout: dTimeout),
         );
 
     final res = await http.Response.fromStream(streamed);
@@ -375,81 +387,84 @@ abstract class FxNetwork<T> {
     bool? debug = false,
     Map<String, String>? headers,
   }) {
-    final buf = StringBuffer();
-    try {
-      buf.write(fullPath.toString().padRight(fullPath.toString().length > 100 ? fullPath.toString().length : 80, " "));
-      buf.write(" -> ");
-      if (res?.reasonPhrase != null) buf.write("${res?.reasonPhrase} | ");
-
-      // truncate body for log safety
-
-      final bodyRaw = (res?.body ?? '');
-      final bodyToLog = bodyRaw.length > maxLogBody ? '${bodyRaw.substring(0, maxLogBody)}... (truncated)' : bodyRaw;
-
-      if (res != null && bodyToLog.isNotEmpty) {
-        try {
-          final decoded = jsonDecode(bodyToLog);
-          if (decoded is Map && decoded.containsKey('message')) {
-            buf.write(decoded['message']);
-          } else {
-            buf.write(bodyToLog);
-          }
-        } catch (_) {
-          buf.write(bodyToLog);
-        }
-      }
-      buf.writeln();
-
-      if (headers != null && ((debug ?? false) || showFullLog)) {
-        final sanitized = Map<String, String>.from(headers);
-        if (sanitized.containsKey('Authorization')) sanitized['Authorization'] = '***REDACTED***';
-        buf.writeln(JsonEncoder.withIndent("  ").convert(sanitized));
-      }
-
-      if (postData != null) {
-        try {
-          buf.writeln(JsonEncoder.withIndent("  ").convert(postData));
-        } catch (_) {
-          buf.writeln(postData.toString());
-        }
-      }
-
-      if (multipartFiles != null && multipartFiles.isNotEmpty) {
-        try {
-          final f = multipartFiles.map((http.MultipartFile e) {
-            return {
-              "Field": e.field,
-              "File-Name": e.filename ?? '',
-              "Type": e.contentType?.type ?? '',
-              "Sub-Type": e.contentType?.subtype ?? '',
-              "Length": e.length ?? 'unknown',
-            };
-          }).toList();
-          buf.writeln(JsonEncoder.withIndent("    ").convert(f));
-        } catch (e, st) {
-          log('Error in FxNetwork (multipart log): $e\n$st');
-        }
-      }
-
-      if ((res != null && res.statusCode != 200) || (debug ?? false) || showFullLog) {
-        try {
-          // prefer pretty JSON if possible, otherwise raw truncated string
-          if (bodyToLog.isNotEmpty) {
-            final decoded = jsonDecode(bodyToLog);
-            buf.writeln(JsonEncoder.withIndent("  ").convert(decoded));
-          }
-        } catch (e, st) {
-          buf.writeln(bodyToLog);
-          log('Error in FxNetwork (body pretty): $e\n$st');
-        }
-      }
-    } catch (e, st) {
-      buf.writeln('Log formatting error: $e\n$st');
-    } finally {
+    if (logEnable) {
+      final buf = StringBuffer();
       try {
-        log(buf.toString(), name: res?.statusCode?.toString() ?? "FxNetwork");
+        buf.write(
+          fullPath.toString().padRight(fullPath.toString().length > 100 ? fullPath.toString().length : 80, " "),
+        );
+        buf.write(" -> ");
+        if (res?.reasonPhrase != null) buf.write("${res?.reasonPhrase} | ");
+
+        // truncate body for log safety
+
+        final bodyToLog = (res?.body ?? '');
+        if (res != null && bodyToLog.isNotEmpty) {
+          try {
+            final decoded = jsonDecode(bodyToLog);
+            if (decoded is Map && decoded.containsKey('message')) {
+              buf.write(decoded['message']);
+            } else {
+              buf.write(bodyToLog);
+            }
+          } catch (e) {
+            buf.write(bodyToLog);
+            buf.write("e31: ${e.toString()}");
+          }
+        }
+        buf.writeln();
+
+        if (headers != null && ((debug ?? false) || showFullLog)) {
+          final sanitized = Map<String, String>.from(headers);
+          if (sanitized.containsKey('Authorization')) sanitized['Authorization'] = '***REDACTED***';
+          buf.writeln(JsonEncoder.withIndent("  ").convert(sanitized));
+        }
+
+        if (postData != null) {
+          try {
+            buf.writeln(JsonEncoder.withIndent("  ").convert(postData));
+          } catch (_) {
+            buf.writeln(postData.toString());
+          }
+        }
+
+        if (multipartFiles != null && multipartFiles.isNotEmpty) {
+          try {
+            final f = multipartFiles.map((http.MultipartFile e) {
+              return {
+                "Field": e.field,
+                "File-Name": e.filename,
+                "Type": e.contentType.type,
+                "Sub-Type": e.contentType.subtype,
+                "Length": e.length,
+              };
+            }).toList();
+            buf.writeln(JsonEncoder.withIndent("    ").convert(f));
+          } catch (e, st) {
+            log('Error in FxNetwork (multipart log): $e\n$st');
+          }
+        }
+
+        if ((res != null && res.statusCode != 200) || (debug ?? false) || showFullLog) {
+          try {
+            // prefer pretty JSON if possible, otherwise raw truncated string
+            if (bodyToLog.isNotEmpty) {
+              final decoded = jsonDecode(bodyToLog);
+              buf.writeln(JsonEncoder.withIndent("  ").convert(decoded));
+            }
+          } catch (e, st) {
+            buf.writeln(bodyToLog);
+            log('Error in FxNetwork (body pretty): $e\n$st');
+          }
+        }
       } catch (e, st) {
-        log('Error in FxNetwork (final logging): $e\n$st');
+        buf.writeln('Log formatting error: $e\n$st');
+      } finally {
+        try {
+          log(buf.toString(), name: " ${res?.statusCode?.toString()} | ${res?.request?.method} " ?? "FxNetwork");
+        } catch (e, st) {
+          log('Error in FxNetwork (final logging): $e\n$st');
+        }
       }
     }
   }
@@ -462,8 +477,8 @@ abstract class FxNetwork<T> {
     }
   }
 
-  IOStreamedResponse _timeOutResponse({required String httpMethod, required String url}) {
-    final Map<String, dynamic> body = {'status': 408, 'message': 'Request Time Out'};
+  IOStreamedResponse _timeOutResponse({required String httpMethod, required String url, required int timeout}) {
+    final Map<String, dynamic> body = {'status': 408, 'message': 'Timeout: Could not connect to server $timeout"'};
     const int statusCode = 408;
     final Uri destination = Uri.parse(url);
     final String jsonBody = jsonEncode(body);
@@ -479,11 +494,13 @@ abstract class FxNetwork<T> {
 
 /* Utilities */
 class ApiException implements Exception {
-  final String? message;
-  const ApiException(this.message);
+  final String? _message;
+  const ApiException(this._message);
 
   @override
-  String toString() => 'ApiException: $message';
+  String toString() => 'ApiException: $_message';
+
+  String get message => '$_message';
 }
 
 class MultipartFormItem {
