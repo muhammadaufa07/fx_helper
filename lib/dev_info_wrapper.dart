@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:fx_helper/network/fx_network.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /* 
@@ -23,12 +25,15 @@ class DevInfoWrapper extends StatelessWidget {
         children: [
           child,
           Positioned(
-            top: MediaQuery.sizeOf(context).height * 0.01,
-            left: (MediaQuery.sizeOf(context).width * 0.5) - 110,
+            top: Platform.isAndroid ? 14 : 3,
+            left: Platform.isAndroid
+                ? (MediaQuery.sizeOf(context).width * 0.5) - (MediaQuery.sizeOf(context).width * 0.22)
+                : (MediaQuery.sizeOf(context).width * 0.5) - (MediaQuery.sizeOf(context).width * 0.3),
+
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              padding: EdgeInsets.symmetric(vertical: 3, horizontal: 8),
               decoration: BoxDecoration(
-                color: Colors.red,
+                color: Colors.deepOrange,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -36,15 +41,28 @@ class DevInfoWrapper extends StatelessWidget {
                   bottomLeft: Radius.circular(20),
                 ),
               ),
-              child: Text(
-                "Developer Build",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
-                  fontSize: 7,
-                  decoration: TextDecoration.none,
-                ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(1.4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(40),
+                      border: BoxBorder.all(color: Colors.white),
+                    ),
+                    child: Icon(Icons.widgets, color: Colors.white, size: 8),
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    "Dev v${FxNetwork.packageInfo?.version}+${FxNetwork.packageInfo?.buildNumber}",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 9,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

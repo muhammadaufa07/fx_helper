@@ -42,6 +42,7 @@ dependencies:
   mime: ^2.0.0
   open_file_manager: ^2.0.1
   no_screenshot: ^0.3.1
+  encrypt: ^5.0.3
   
 
 dev_dependencies:
