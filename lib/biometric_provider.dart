@@ -152,12 +152,12 @@ class BiometricProvider extends ChangeNotifier {
           AndroidAuthMessages(signInTitle: title, cancelButton: cancelTitle),
           IOSAuthMessages(cancelButton: cancelTitle),
         ],
-        options: AuthenticationOptions(
-          sensitiveTransaction: true,
-          useErrorDialogs: true,
-          biometricOnly: true,
-          stickyAuth: true,
-        ),
+        // options: AuthenticationOptions(
+        //   sensitiveTransaction: true,
+        //   useErrorDialogs: true,
+        //   biometricOnly: true,
+        //   stickyAuth: true,
+        // ),
       );
     } on PlatformException catch (e) {
       print('platform exception: ${e.toString()}');

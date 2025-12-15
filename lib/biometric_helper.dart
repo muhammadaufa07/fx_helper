@@ -89,12 +89,12 @@ class BiometricHelper {
           AndroidAuthMessages(signInTitle: title, cancelButton: cancelTitle),
           IOSAuthMessages(cancelButton: cancelTitle),
         ],
-        options: AuthenticationOptions(
-          sensitiveTransaction: true,
-          useErrorDialogs: true,
-          biometricOnly: true,
-          stickyAuth: true,
-        ),
+        // options: AuthenticationOptions(
+        //   sensitiveTransaction: true,
+        //   useErrorDialogs: true,
+        //   biometricOnly: true,
+        //   stickyAuth: true,
+        // ),
       );
     } on PlatformException catch (e) {
       info = "Biometric Error";
