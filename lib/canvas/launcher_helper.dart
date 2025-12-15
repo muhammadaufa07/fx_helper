@@ -1,7 +1,7 @@
 import 'package:url_launcher/url_launcher.dart';
 
-class UrlLauncher {
-  UrlLauncher._();
+class LauncherHelper {
+  LauncherHelper._();
 
   /* --------------------------------------------------
    * INTERNAL UTILS
