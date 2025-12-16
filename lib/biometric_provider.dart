@@ -53,7 +53,7 @@ class BiometricProvider extends ChangeNotifier {
     try {
       isBioEnabled = await isEnabled();
       _isBioSupported = await _isSupported();
-      _checkAllowLoginWithBiometric();
+      await _checkAllowLoginWithBiometric();
 
       print("===");
       print("isBiometricSupported : $_isBioSupported");
@@ -61,6 +61,7 @@ class BiometricProvider extends ChangeNotifier {
     } catch (e) {
       print(e.toString());
     }
+    notifyListeners();
   }
 
   Future<void> changeBiometric({bool? isEnabled}) async {

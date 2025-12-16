@@ -28,6 +28,7 @@ abstract class FxNetwork<T> {
   dynamic get env;
   bool get showFullLog;
   bool get logEnable => isDevMode;
+  bool get hideSensitiveInfo => isDevMode;
 
   int get getTimeOut => 20;
   int get postTimeOut => 20;
@@ -39,8 +40,11 @@ abstract class FxNetwork<T> {
   String? get token => _token;
 
   set token(String? newToken) {
+    print("ADD TOKEN: $newToken");
     String? t = newToken;
-    if (t?.isEmpty == true) t = null;
+    if (t?.isEmpty == true) {
+      t = null;
+    }
     _token = t;
   }
 
@@ -417,7 +421,9 @@ abstract class FxNetwork<T> {
 
         if (headers != null && ((debug ?? false) || showFullLog)) {
           final sanitized = Map<String, String>.from(headers);
-          if (sanitized.containsKey('Authorization')) sanitized['Authorization'] = '***REDACTED***';
+          if (sanitized.containsKey('Authorization') && hideSensitiveInfo) {
+            sanitized['Authorization'] = '***REDACTED***';
+          }
           buf.writeln(JsonEncoder.withIndent("  ").convert(sanitized));
         }
 
