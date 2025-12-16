@@ -15,7 +15,7 @@ class ScreenshotHelper {
 
   static Future<void> enable() async {
     try {
-      bool result = await _noScreenshot.screenshotOff();
+      bool result = await _noScreenshot.screenshotOn();
       log("Screenshot is Enabled [${result ? "success" : "failed"}]");
     } catch (e) {
       log("Screenshot is Enabled");

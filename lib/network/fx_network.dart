@@ -92,7 +92,7 @@ abstract class FxNetwork<T> {
 
   /* ==== ==== ==== GET ==== ==== ==== */
 
-  Future<http.Response> get(
+  Future<http.Response> getApi(
     T net,
     String path, {
     Map<String, String>? params,
@@ -101,7 +101,7 @@ abstract class FxNetwork<T> {
     bool? debug,
   }) async {
     Uri fullPath = Uri.parse("${getDomainName(net)}$path");
-    return await getGlobal(
+    return await get(
       /*  */
       fullPath,
       params: params,
@@ -111,7 +111,7 @@ abstract class FxNetwork<T> {
     );
   }
 
-  Future<http.Response> getGlobal(
+  Future<http.Response> get(
     Uri fullPath, {
     Map<String, String>? params,
     Map<String, String>? headers,
@@ -140,7 +140,7 @@ abstract class FxNetwork<T> {
 
   /* ==== ==== ==== POST ==== ==== ==== */
 
-  Future<http.Response> post(
+  Future<http.Response> postApi(
     T net,
     String path,
     Map<String, dynamic> postData, {
@@ -149,10 +149,10 @@ abstract class FxNetwork<T> {
     bool? debug,
   }) async {
     Uri fullPath = Uri.parse("${getDomainName(net)}$path");
-    return await postGlobal(fullPath, postData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
+    return await post(fullPath, postData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
   }
 
-  Future<http.Response> postGlobal(
+  Future<http.Response> post(
     Uri fullPath,
     Map<String, dynamic> postData, {
     Map<String, String>? headers,
@@ -176,7 +176,7 @@ abstract class FxNetwork<T> {
 
   /* ==== ==== ==== POST MULTIPART ==== ==== ==== */
 
-  Future<http.Response> postMultipart(
+  Future<http.Response> postMultipartApi(
     T net,
     String path,
     Map<String, String> postData,
@@ -186,7 +186,7 @@ abstract class FxNetwork<T> {
     bool? debug,
   }) async {
     Uri fullPath = Uri.parse("${getDomainName(net)}$path");
-    return await postMultipartGlobal(
+    return await postMultipart(
       fullPath,
       postData,
       files,
@@ -196,7 +196,7 @@ abstract class FxNetwork<T> {
     );
   }
 
-  Future<http.Response> postMultipartGlobal(
+  Future<http.Response> postMultipart(
     Uri fullPath,
     Map<String, String> postData,
     List<MultipartFormItem> files, {
@@ -240,7 +240,7 @@ abstract class FxNetwork<T> {
 
   /* ==== ==== ==== DELETE ==== ==== ==== */
 
-  Future<http.Response> delete(
+  Future<http.Response> deleteApi(
     /*  */
     T net,
     String path, {
@@ -250,7 +250,8 @@ abstract class FxNetwork<T> {
     bool? debug,
   }) async {
     Uri fullPath = Uri.parse("${getDomainName(net)}$path");
-    return await deleteGlobal(
+    return await delete(
+      /*  */
       fullPath,
       params: params,
       headers: headers ?? getHeader(),
@@ -259,7 +260,7 @@ abstract class FxNetwork<T> {
     );
   }
 
-  Future<http.Response> deleteGlobal(
+  Future<http.Response> delete(
     /*  */
     Uri fullPath, {
     Map<String, String>? params,
@@ -286,7 +287,7 @@ abstract class FxNetwork<T> {
 
   /* ==== ==== ==== PUT ==== ==== ==== */
 
-  Future<http.Response> put(
+  Future<http.Response> putApi(
     T net,
     String path,
     Map<String, dynamic> putData, {
@@ -295,10 +296,10 @@ abstract class FxNetwork<T> {
     bool? debug,
   }) async {
     Uri fullPath = Uri.parse("${getDomainName(net)}$path");
-    return await putGlobal(fullPath, putData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
+    return await put(fullPath, putData, headers: headers ?? getHeader(), timeout: timeout, debug: debug);
   }
 
-  Future<http.Response> putGlobal(
+  Future<http.Response> put(
     Uri fullPath,
     Map<String, dynamic> putData, {
     Map<String, String>? headers,
@@ -316,7 +317,7 @@ abstract class FxNetwork<T> {
 
   /* ==== ==== ==== PUT MULTIPART ==== ==== ==== */
 
-  Future<http.Response> putMultipart(
+  Future<http.Response> putMultipartApi(
     T net,
     String path,
     Map<String, String> putData,
@@ -326,7 +327,7 @@ abstract class FxNetwork<T> {
     bool? debug,
   }) async {
     Uri fullPath = Uri.parse("${getDomainName(net)}$path");
-    return await putMultipartGlobal(
+    return await putMultipart(
       fullPath,
       putData,
       files,
@@ -336,7 +337,7 @@ abstract class FxNetwork<T> {
     );
   }
 
-  Future<http.Response> putMultipartGlobal(
+  Future<http.Response> putMultipart(
     Uri fullPath,
     Map<String, String> putData,
     List<MultipartFormItem> files, {

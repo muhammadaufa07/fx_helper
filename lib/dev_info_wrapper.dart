@@ -25,9 +25,9 @@ class DevInfoWrapper extends StatelessWidget {
         children: [
           child,
           Positioned(
-            top: Platform.isAndroid ? 14 : 3,
+            top: Platform.isAndroid ? 8 : 3,
             left: Platform.isAndroid
-                ? (MediaQuery.sizeOf(context).width * 0.5) - (MediaQuery.sizeOf(context).width * 0.22)
+                ? (MediaQuery.sizeOf(context).width * 0.5) - (MediaQuery.sizeOf(context).width * 0.28)
                 : (MediaQuery.sizeOf(context).width * 0.5) - (MediaQuery.sizeOf(context).width * 0.3),
 
             child: Container(
