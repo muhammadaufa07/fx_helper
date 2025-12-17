@@ -35,12 +35,11 @@ abstract class FxNetwork<T> {
   int get postMultipartTimeOut => 60;
 
   /* Token */
-  String? _token;
+  static String? _token;
 
   String? get token => _token;
 
   set token(String? newToken) {
-    print("ADD TOKEN: $newToken");
     String? t = newToken;
     if (t?.isEmpty == true) {
       t = null;
@@ -520,7 +519,7 @@ class MultipartFormItem {
   concrete implementation for internal FxHelper use only
 */
 class FxNetworkLocal extends FxNetwork {
-  FxNetworkLocal({http.Client? client}) : super(client: client);
+  FxNetworkLocal({super.client});
 
   @override
   get env => throw UnimplementedError();
