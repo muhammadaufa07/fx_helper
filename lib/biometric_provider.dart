@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fx_helper/secure_storage.dart';
@@ -21,96 +23,68 @@ class BiometricProvider extends ChangeNotifier {
     try {
       isLoading = true;
       auth = LocalAuthentication();
-      _checkBiometric();
+      refresh().then((value) {
+        isLoading = false;
+        notifyListeners();
+      });
       isLoading = false;
       notifyListeners();
     } catch (e) {
-      print(e.toString());
+      log("BiometricProvider(): $e");
     }
   }
-
-  Future<bool> isEnabled() async {
+  Future<void> refresh() async {
+    isLoading = true;
     try {
       isBioEnabled = await SecureStorage().getAllowBiometricLogin();
-    } catch (e) {
-      print(e.toString());
-    }
-    return isBioEnabled;
-  }
-
-  Future<bool> _isSupported() async {
-    try {
       final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
-      print("canAuthenticateWithBiometrics: $canAuthenticateWithBiometrics");
       _isBioSupported = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+      allowLoginWithBiometric = _isBioSupported && isBioEnabled;
+      // log("isBioEnabled: $isBioEnabled");
+      // log("canAuthenticateWithBiometrics: $canAuthenticateWithBiometrics");
+      // log("_isBioSupported: $_isBioSupported");
+      // log("allowLoginWithBiometric: $allowLoginWithBiometric");
     } catch (e) {
-      print(e.toString());
+      log("BiometricProvider: refresh() $e");
     }
-    return _isBioSupported;
-  }
-
-  Future<void> _checkBiometric() async {
-    try {
-      isBioEnabled = await isEnabled();
-      _isBioSupported = await _isSupported();
-      await _checkAllowLoginWithBiometric();
-
-      print("===");
-      print("isBiometricSupported : $_isBioSupported");
-      print("isBiometricEnabled : $isBioEnabled");
-    } catch (e) {
-      print(e.toString());
-    }
+    isLoading = false;
     notifyListeners();
   }
 
-  Future<void> changeBiometric({bool? isEnabled}) async {
-    print("changeBiometric()");
+  Future<void> changeBiometric({bool? enabled}) async {
+    log("changeBiometric()");
     isLoading = true;
     notifyListeners();
     try {
-      await _checkBiometric();
-      if (isEnabled ?? !isBioEnabled) {
+      await refresh();
+      if (enabled ?? !isBioEnabled) {
         bool isSuccess = await authenticate();
         if (isSuccess) {
-          var currentSetting = await this.isEnabled();
-          await SecureStorage().setAllowBiometricLogin(isEnabled ?? !currentSetting);
+          await SecureStorage().setAllowBiometricLogin(enabled ?? !isBioEnabled);
         } else {
           SnackbarHelper.showSnackBar(SnackbarState.warning, "Authentikasi Gagal");
         }
       } else {
-        var currentSetting = await this.isEnabled();
-        await SecureStorage().setAllowBiometricLogin(isEnabled ?? !currentSetting);
+        await SecureStorage().setAllowBiometricLogin(enabled ?? !isBioEnabled);
       }
-      await _checkBiometric();
+      // await _checkBiometric();
     } catch (e) {
-      print(e.toString());
+      log("changeBiometric(): $e");
     }
+    await refresh();
     isLoading = false;
     notifyListeners();
-    print("changeBiometric() done");
+    log("changeBiometric() done");
   }
 
-  Future<bool> _checkAllowLoginWithBiometric() async {
-    try {
-      // String email = await SecureStorage().getBiometricEmail();
-      // String password = await SecureStorage().getBiometricPassword();
-      // bool isEmailPassCorrect =
-      //     ValidatorHelper.validateEmail(email) == null && ValidatorHelper.validatePassword(password) == null;
-      allowLoginWithBiometric = await _isSupported() && await isEnabled();
-    } catch (e) {
-      print(e.toString());
-    }
-
-    return allowLoginWithBiometric;
-  }
-
-  Future<bool> setBiometricLoginData({String? currentLoginEmail, String? currentLoginPassword}) async {
+  Future<void> setBiometricLoginData({String? currentLoginEmail, String? currentLoginPassword}) async {
+    log("currentLoginEmail $currentLoginEmail");
+    log("currentLoginPassword $currentLoginPassword");
     try {
       String oldEmail = await SecureStorage().getBiometricEmail();
       String oldPassword = await SecureStorage().getBiometricPassword();
 
-      if (await isEnabled() &&
+      if (isBioEnabled &&
           (oldEmail.isEmpty ||
               oldPassword.isEmpty ||
               currentLoginEmail == null ||
@@ -120,7 +94,6 @@ class BiometricProvider extends ChangeNotifier {
               oldEmail != currentLoginEmail ||
               oldPassword != currentLoginPassword)) {
         await SecureStorage().setAllowBiometricLogin(false);
-        await _checkAllowLoginWithBiometric();
         SnackbarHelper.showSnackBar(
           SnackbarState.success,
           "To protect your privacy, we have cleared previous biometric login. You can reactivate this feature from settings",
@@ -130,15 +103,11 @@ class BiometricProvider extends ChangeNotifier {
       await SecureStorage().setBiometricEmail(currentLoginEmail ?? "");
       await SecureStorage().setBiometricPassword(currentLoginPassword ?? "");
     } catch (e) {
-      print(e.toString());
+      log("setBiometricLoginData(): $e");
     }
-
-    return allowLoginWithBiometric;
+    await refresh();
+    notifyListeners();
   }
-
-  // Future<List<BiometricType>> getAvailableBiometrics() async {
-  //   return await auth.getAvailableBiometrics();
-  // }
 
   Future<bool> authenticate({
     String title = "Authentication is Required",
@@ -153,17 +122,14 @@ class BiometricProvider extends ChangeNotifier {
           AndroidAuthMessages(signInTitle: title, cancelButton: cancelTitle),
           IOSAuthMessages(cancelButton: cancelTitle),
         ],
-        // options: AuthenticationOptions(
-        //   sensitiveTransaction: true,
-        //   useErrorDialogs: true,
-        //   biometricOnly: true,
-        //   stickyAuth: true,
-        // ),
+        sensitiveTransaction: true,
+        biometricOnly: true,
+        persistAcrossBackgrounding: true,
       );
     } on PlatformException catch (e) {
-      print('platform exception: ${e.toString()}');
+      log("authenticate(): $e");
     } catch (e) {
-      print(e.toString());
+      log("authenticate2(): $e");
     }
     return didAuthenticate;
   }
