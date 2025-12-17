@@ -18,8 +18,8 @@ dependencies:
   local_auth_android: ^2.0.4
   local_auth_darwin: ^2.0.1
   fluttertoast: ^9.0.0
-  syncfusion_flutter_core: ^31.1.20
-  syncfusion_flutter_pdfviewer: ^31.1.20
+  syncfusion_flutter_core: ^32.1.19
+  syncfusion_flutter_pdfviewer: ^32.1.19
   printing: ^5.14.2
   pdf: ^3.11.3
   http_parser: ^4.1.2
