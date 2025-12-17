@@ -32,7 +32,6 @@ class ValidatorHelper {
   }
 
   static String? validatePassword(String? password, {String? password2}) {
-    print("validatePassword($password, $password2)");
     if (password == null || password.isEmpty) {
       return "Silahkan Masukkan Password Anda";
     } else if (password2 != null && password != password2) {
