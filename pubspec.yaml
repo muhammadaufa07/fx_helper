@@ -43,6 +43,7 @@ dependencies:
   open_file_manager: ^2.0.1
   no_screenshot: ^0.3.1
   encrypt: ^5.0.3
+  flutter_cache_manager: ^3.4.1
   
 
 dev_dependencies:
