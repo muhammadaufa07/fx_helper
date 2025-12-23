@@ -437,14 +437,14 @@ abstract class FxNetwork<T> {
         buf.write(res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31m");
         buf.write("[ ${res?.statusCode.toString()} | ${res?.request?.method} ]  ");
 
-        if (!logShowFull) {
-          buf.write(_logUrl(res, fullPath));
-          buf.write(_logMessage(res));
-        } else {
+        if (logShowFull) {
           buf.writeln(_logMessage(res));
           buf.write(_logUrl(res, fullPath));
-          buf.writeln("\x1B[0m");
+        } else {
+          buf.write(_logUrl(res, fullPath));
+          buf.write(_logMessage(res));
         }
+        buf.writeln("\x1B[0m");
 
         /* HEADER */
         if (headers != null && ((debug ?? false) || logShowFull)) {
