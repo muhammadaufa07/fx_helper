@@ -383,6 +383,9 @@ abstract class FxNetwork<T> {
 
   /* ==== ==== ==== LOG ==== ==== ==== */
 
+  // String _logColor(String string, http.Response? res) =>
+  //     res?.statusCode == 200 ? AnsiColor.fGreen(string) : AnsiColor.fRed(string);
+
   void _logSimple(
     Uri fullPath,
     http.Response? res, {
@@ -394,46 +397,63 @@ abstract class FxNetwork<T> {
     if (logEnable) {
       final buf = StringBuffer();
       try {
+        /* STATUS CODE */
+        buf.write(res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31m");
+        buf.write("[ ${res?.statusCode.toString()} | ${res?.request?.method} ]  ");
+
+        /* URL PATH */
         buf.write(
-          fullPath.toString().padRight(fullPath.toString().length > 100 ? fullPath.toString().length : 80, " "),
+          "${fullPath.toString().padRight(fullPath.toString().length > 100 ? fullPath.toString().length : 80)} ",
         );
         buf.write(" -> ");
+
+        /* REASON PHRASE */
         if (res?.reasonPhrase != null) buf.write("${res?.reasonPhrase} | ");
 
-        // truncate body for log safety
-
-        final bodyToLog = (res?.body ?? '');
-        if (res != null && bodyToLog.isNotEmpty) {
+        /* STATUS MESSAGE */
+        final body = (res?.body ?? '');
+        if (res != null && body.isNotEmpty) {
           try {
-            final decoded = jsonDecode(bodyToLog);
+            final decoded = jsonDecode(body);
             if (decoded is Map && decoded.containsKey('message')) {
               buf.write(decoded['message']);
-            } else {
-              buf.write(bodyToLog);
             }
           } catch (e) {
-            buf.write(bodyToLog);
             buf.write("e31: ${e.toString()}");
           }
         }
-        buf.writeln();
+        buf.writeln("\x1B[0m");
 
+        /* HEADER */
         if (headers != null && ((debug ?? false) || showFullLog)) {
           final sanitized = Map<String, String>.from(headers);
           if (sanitized.containsKey('Authorization') && hideSensitiveInfo) {
             sanitized['Authorization'] = '***REDACTED***';
           }
-          buf.writeln(JsonEncoder.withIndent("  ").convert(sanitized));
-        }
 
-        if (postData != null) {
-          try {
-            buf.writeln(JsonEncoder.withIndent("  ").convert(postData));
-          } catch (_) {
-            buf.writeln(postData.toString());
+          for (var e in sanitized.entries) {
+            buf.write("\x1B[36m");
+            buf.write("${e.key.padRight(14, " ")} : ${e.value}");
+            buf.write("\x1B[0m\n");
           }
         }
 
+        /* POSTDATA */
+        if (postData != null && postData.isNotEmpty) {
+          String t = "\x1B[37m";
+          try {
+            t += JsonEncoder.withIndent("\x1B[37m  ").convert(postData);
+            if (t.length > 1) {
+              var lastChar = t[t.length - 1];
+              t = t.substring(0, t.length - 1);
+              t += "\x1B[37m$lastChar\n";
+            }
+          } catch (_) {
+            t += postData.toString();
+          }
+          buf.write(t);
+        }
+        /* POST MULTIPART */
         if (multipartFiles != null && multipartFiles.isNotEmpty) {
           try {
             final f = multipartFiles.map((http.MultipartFile e) {
@@ -445,29 +465,45 @@ abstract class FxNetwork<T> {
                 "Length": e.length,
               };
             }).toList();
-            buf.writeln(JsonEncoder.withIndent("    ").convert(f));
+            buf.writeln(JsonEncoder.withIndent(" ").convert(f));
           } catch (e, st) {
             log('Error in FxNetwork (multipart log): $e\n$st');
           }
         }
-
+        /* BODY */
         if ((res != null && res.statusCode != 200) || (debug ?? false) || showFullLog) {
+          String t = "\x1B[33m";
           try {
-            // prefer pretty JSON if possible, otherwise raw truncated string
-            if (bodyToLog.isNotEmpty) {
-              final decoded = jsonDecode(bodyToLog);
-              buf.writeln(JsonEncoder.withIndent("  ").convert(decoded));
+            if (body.isNotEmpty) {
+              final decoded = jsonDecode(body);
+              var encodedBody = JsonEncoder.withIndent("\x1B[33m  ").convert(decoded);
+              if (encodedBody.length > 500) {
+                var lines = encodedBody.split("\n").toList();
+                var n = lines.length > 10 ? 10 : lines.length;
+                for (var i = 0; i < n; i++) {
+                  t += lines[i];
+                }
+                // t = t.substring(0, 100);
+                // t += "\n\x1B[33m ** Truc ated ** ";
+              } else {}
+
+              if (t.length > 1) {
+                var lastChar = t[t.length - 1];
+                t = t.substring(0, t.length - 1);
+                t += "\x1B[33m$lastChar\n";
+              }
             }
           } catch (e, st) {
-            buf.writeln(bodyToLog);
+            buf.writeln(body);
             log('Error in FxNetwork (body pretty): $e\n$st');
           }
+          buf.write(t);
         }
       } catch (e, st) {
         buf.writeln('Log formatting error: $e\n$st');
       } finally {
         try {
-          log(buf.toString(), name: " ${res?.statusCode?.toString()} | ${res?.request?.method} " ?? "FxNetwork");
+          log("\n$buf", name: "\b");
         } catch (e, st) {
           log('Error in FxNetwork (final logging): $e\n$st');
         }
