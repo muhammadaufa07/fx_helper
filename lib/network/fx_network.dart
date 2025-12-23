@@ -26,7 +26,7 @@ abstract class FxNetwork<T> {
 
   bool get isDevMode;
   dynamic get env;
-  bool get logShowFull => !isDevMode;
+  bool get logShowFull => isDevMode;
   bool get logEnable => isDevMode;
   bool get logHideSensitiveInfo => !isDevMode;
   int get logTruncateAt => 30;
