@@ -26,9 +26,10 @@ abstract class FxNetwork<T> {
 
   bool get isDevMode;
   dynamic get env;
-  bool get showFullLog;
+  bool get logShowFull;
   bool get logEnable => isDevMode;
-  bool get hideSensitiveInfo => isDevMode;
+  bool get logHideSensitiveInfo => isDevMode;
+  int get logTruncateAt => 30;
 
   int get getTimeOut => 20;
   int get postTimeOut => 20;
@@ -386,6 +387,39 @@ abstract class FxNetwork<T> {
   // String _logColor(String string, http.Response? res) =>
   //     res?.statusCode == 200 ? AnsiColor.fGreen(string) : AnsiColor.fRed(string);
 
+  String _logUrl(http.Response? res, Uri fullPath) {
+    String t = "";
+    try {
+      t += res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31m";
+      String p = fullPath.toString();
+      t += p.padRight(p.length < 75 ? 75 : p.length + 1);
+    } catch (e) {
+      t += fullPath.toString();
+      log("FxHelper: ${e.toString()}");
+    }
+    return t;
+  }
+
+  String _logMessage(http.Response? res) {
+    String t = "";
+    /* REASON PHRASE */
+    if (res?.reasonPhrase != null) t += "${res?.reasonPhrase} | ";
+
+    /* STATUS MESSAGE */
+    final body = (res?.body ?? '');
+    if (res != null && body.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(body);
+        if (decoded is Map && decoded.containsKey('message')) {
+          t += decoded['message'];
+        }
+      } catch (e) {
+        t += "e31: ${e.toString()}";
+      }
+    }
+    return t;
+  }
+
   void _logSimple(
     Uri fullPath,
     http.Response? res, {
@@ -398,36 +432,24 @@ abstract class FxNetwork<T> {
       final buf = StringBuffer();
       try {
         /* STATUS CODE */
+        if (logShowFull) buf.writeln();
+
         buf.write(res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31m");
         buf.write("[ ${res?.statusCode.toString()} | ${res?.request?.method} ]  ");
 
-        /* URL PATH */
-        buf.write(
-          "${fullPath.toString().padRight(fullPath.toString().length > 100 ? fullPath.toString().length : 80)} ",
-        );
-        buf.write(" -> ");
-
-        /* REASON PHRASE */
-        if (res?.reasonPhrase != null) buf.write("${res?.reasonPhrase} | ");
-
-        /* STATUS MESSAGE */
-        final body = (res?.body ?? '');
-        if (res != null && body.isNotEmpty) {
-          try {
-            final decoded = jsonDecode(body);
-            if (decoded is Map && decoded.containsKey('message')) {
-              buf.write(decoded['message']);
-            }
-          } catch (e) {
-            buf.write("e31: ${e.toString()}");
-          }
+        if (!logShowFull) {
+          buf.write(_logUrl(res, fullPath));
+          buf.write(_logMessage(res));
+        } else {
+          buf.writeln(_logMessage(res));
+          buf.write(_logUrl(res, fullPath));
+          buf.writeln("\x1B[0m");
         }
-        buf.writeln("\x1B[0m");
 
         /* HEADER */
-        if (headers != null && ((debug ?? false) || showFullLog)) {
+        if (headers != null && ((debug ?? false) || logShowFull)) {
           final sanitized = Map<String, String>.from(headers);
-          if (sanitized.containsKey('Authorization') && hideSensitiveInfo) {
+          if (sanitized.containsKey('Authorization') && logHideSensitiveInfo) {
             sanitized['Authorization'] = '***REDACTED***';
           }
 
@@ -471,21 +493,23 @@ abstract class FxNetwork<T> {
           }
         }
         /* BODY */
-        if ((res != null && res.statusCode != 200) || (debug ?? false) || showFullLog) {
+        final body = (res?.body ?? '');
+        if ((res != null && res.statusCode != 200) || (debug ?? false) || logShowFull) {
           String t = "\x1B[33m";
           try {
             if (body.isNotEmpty) {
               final decoded = jsonDecode(body);
-              var encodedBody = JsonEncoder.withIndent("\x1B[33m  ").convert(decoded);
-              if (encodedBody.length > 500) {
-                var lines = encodedBody.split("\n").toList();
-                var n = lines.length > 10 ? 10 : lines.length;
+              String encodedBody = JsonEncoder.withIndent("\x1B[33m  ").convert(decoded);
+              var lines = encodedBody.split("\n").toList();
+              if (logTruncateAt != 0 && lines.length > logTruncateAt && (debug ?? false) == false) {
+                var n = lines.length > logTruncateAt ? logTruncateAt : lines.length;
                 for (var i = 0; i < n; i++) {
-                  t += lines[i];
+                  t += "${lines[i]}\n";
                 }
-                // t = t.substring(0, 100);
-                // t += "\n\x1B[33m ** Truc ated ** ";
-              } else {}
+                t += "\x1B[41m\x1B[37m*** Truncated ***";
+              } else {
+                t += encodedBody;
+              }
 
               if (t.length > 1) {
                 var lastChar = t[t.length - 1];
@@ -503,7 +527,7 @@ abstract class FxNetwork<T> {
         buf.writeln('Log formatting error: $e\n$st');
       } finally {
         try {
-          log("\n$buf", name: "\b");
+          log("$buf", name: "\b");
         } catch (e, st) {
           log('Error in FxNetwork (final logging): $e\n$st');
         }
@@ -561,7 +585,7 @@ class FxNetworkLocal extends FxNetwork {
   get env => throw UnimplementedError();
 
   @override
-  bool get showFullLog => false;
+  bool get logShowFull => false;
 
   @override
   String getDomainName(net) {
