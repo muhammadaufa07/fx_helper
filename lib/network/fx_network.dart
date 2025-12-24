@@ -402,16 +402,18 @@ abstract class FxNetwork<T> {
 
   String _logMessage(http.Response? res) {
     String t = "";
+    t += res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31;5m";
     /* REASON PHRASE */
-    if (res?.reasonPhrase != null) t += "${res?.reasonPhrase} | ";
-
+    if (res?.reasonPhrase != null) t += "${res?.reasonPhrase}";
+    t += "\x1B[0m";
+    t += res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31m";
     /* STATUS MESSAGE */
     final body = (res?.body ?? '');
     if (res != null && body.isNotEmpty) {
       try {
         final decoded = jsonDecode(body);
         if (decoded is Map && decoded.containsKey('message')) {
-          t += decoded['message'];
+          t += " | ${decoded['message']}";
         }
       } catch (e) {
         t += "e31: ${e.toString()}";
