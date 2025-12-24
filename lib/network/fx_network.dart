@@ -402,7 +402,7 @@ abstract class FxNetwork<T> {
 
   String _logMessage(http.Response? res) {
     String t = "";
-    t += res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31;5m";
+    t += res?.statusCode == 200 ? "\x1B[32m" : "\x1B[1;91m";
     /* REASON PHRASE */
     if (res?.reasonPhrase != null) t += "${res?.reasonPhrase}";
     t += "\x1B[0m";
