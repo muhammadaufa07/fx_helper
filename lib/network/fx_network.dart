@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/io_client.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
@@ -529,7 +530,16 @@ abstract class FxNetwork<T> {
         buf.writeln('Log formatting error: $e\n$st');
       } finally {
         try {
-          log("$buf", name: "\b");
+          if (kDebugMode == false) {
+            /* 
+              Force logging when on production.
+              log() is omitted on production by default
+            */
+            // ignore: avoid_print
+            print(buf);
+          } else {
+            log("$buf", name: "\b");
+          }
         } catch (e, st) {
           log('Error in FxNetwork (final logging): $e\n$st');
         }
