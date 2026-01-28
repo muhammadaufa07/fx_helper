@@ -616,7 +616,7 @@ abstract class FxNetwork<T> {
   }
 
   IOStreamedResponse _timeOutResponse({required String httpMethod, required String url, required int timeout}) {
-    final Map<String, dynamic> body = {'status': 408, 'message': 'Timeout: Could not connect to server $timeout"'};
+    final Map<String, dynamic> body = {'status': 408, 'message': 'Timeout: Could not connect to server $timeout'};
     const int statusCode = 408;
     final Uri destination = Uri.parse(url);
     final String jsonBody = jsonEncode(body);
