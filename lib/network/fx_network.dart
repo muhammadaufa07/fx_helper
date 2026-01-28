@@ -29,12 +29,24 @@ abstract class FxNetwork<T> {
   dynamic get env;
   bool get logShowFull => false;
   bool get logEnable => isDevMode;
+
+  /// Show log in production.
+  /// [DO NOT ENABLE UNLESS REQUIRED]
+  ///
+  /// by default log is not visible in production (APK or Release build)
+  bool get logInRelease => false;
+
   bool get logHideSensitiveInfo => true;
   int get logTruncateAt => 30;
 
   int get getTimeOut => 20;
   int get postTimeOut => 20;
   int get postMultipartTimeOut => 60;
+
+  int get postDelayMs => 0;
+  int get getDelayMs => 0;
+  int get putDelayMs => 0;
+  int get deleteDelayMs => 0;
 
   /* Token */
   static String? _token;
@@ -130,6 +142,9 @@ abstract class FxNetwork<T> {
     final dTimeout = timeout ?? getTimeOut;
     final merged = headers ?? {};
 
+    if (getDelayMs > 0) {
+      await Future.delayed(Duration(milliseconds: getDelayMs));
+    }
     res = await httpClient
         .get(newUri, headers: merged)
         .timeout(
@@ -167,6 +182,9 @@ abstract class FxNetwork<T> {
     final dTimeout = timeout ?? postTimeOut;
     final merged = headers ?? {};
     http.Response res;
+    if (postDelayMs > 0) {
+      await Future.delayed(Duration(milliseconds: postDelayMs));
+    }
     res = await httpClient
         .post(fullPath, body: jsonEncode(postData), headers: merged)
         .timeout(
@@ -236,7 +254,9 @@ abstract class FxNetwork<T> {
           Duration(seconds: dTimeout),
           onTimeout: () => _timeOutResponse(httpMethod: "POST", url: fullPath.toString(), timeout: dTimeout),
         );
-
+    if (postDelayMs > 0) {
+      await Future.delayed(Duration(milliseconds: postDelayMs));
+    }
     final res = await http.Response.fromStream(streamed);
     _logSimple(fullPath, res, postData: postData, multipartFiles: multipartFiles, headers: merged, debug: debug);
     if (res.statusCode == 408) throw TimeoutException(res.reasonPhrase);
@@ -276,7 +296,9 @@ abstract class FxNetwork<T> {
     final dTimeout = timeout ?? getTimeOut;
     final merged = headers ?? {};
     Uri newUri = _buildUri(fullPath, params);
-
+    if (deleteDelayMs > 0) {
+      await Future.delayed(Duration(milliseconds: deleteDelayMs));
+    }
     final res = await httpClient
         .delete(newUri, headers: merged)
         .timeout(
@@ -365,6 +387,9 @@ abstract class FxNetwork<T> {
       multipartFiles.add(mfile);
     }
 
+    if (putDelayMs > 0) {
+      await Future.delayed(Duration(milliseconds: putDelayMs));
+    }
     var request = http.MultipartRequest('PUT', fullPath);
     if (merged.isNotEmpty) request.headers.addAll(merged);
     request.fields.addAll(putData);
@@ -398,6 +423,7 @@ abstract class FxNetwork<T> {
       t += fullPath.toString();
       log("FxHelper: ${e.toString()}");
     }
+    t += "\x1B[0m";
     return t;
   }
 
@@ -420,6 +446,7 @@ abstract class FxNetwork<T> {
         t += "e31: ${e.toString()}";
       }
     }
+    t += "\x1B[0m";
     return t;
   }
 
@@ -428,17 +455,21 @@ abstract class FxNetwork<T> {
     http.Response? res, {
     Map<String, dynamic>? postData,
     List<http.MultipartFile>? multipartFiles,
-    bool? debug = false,
+    bool? debug,
     Map<String, String>? headers,
   }) {
-    if (logEnable) {
+    // print("\x1B[0m");
+
+    if (logEnable && debug != false) {
       final buf = StringBuffer();
+      final sbuf = StringBuffer();
       try {
         /* STATUS CODE */
         if (logShowFull) buf.writeln();
 
         buf.write(res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31m");
         buf.write("[ ${res?.statusCode.toString()} | ${res?.request?.method} ]  ");
+        buf.writeln("\x1B[0m");
 
         if (logShowFull) {
           buf.writeln(_logMessage(res));
@@ -447,10 +478,11 @@ abstract class FxNetwork<T> {
           buf.write(_logUrl(res, fullPath));
           buf.write(_logMessage(res));
         }
-        buf.writeln("\x1B[0m");
+
+        buf.writeln();
 
         /* HEADER */
-        if (headers != null && ((debug ?? false) || logShowFull)) {
+        if (headers != null && ((debug == true) || logShowFull)) {
           final sanitized = Map<String, String>.from(headers);
           if (sanitized.containsKey('Authorization') && logHideSensitiveInfo) {
             sanitized['Authorization'] = '***REDACTED***';
@@ -465,18 +497,31 @@ abstract class FxNetwork<T> {
 
         /* POSTDATA */
         if (postData != null && postData.isNotEmpty) {
-          String t = "\x1B[37m";
+          sbuf.clear();
+          sbuf.write("\x1B[35m"); //change to 37
           try {
-            t += JsonEncoder.withIndent("\x1B[37m  ").convert(postData);
-            if (t.length > 1) {
-              var lastChar = t[t.length - 1];
-              t = t.substring(0, t.length - 1);
-              t += "\x1B[37m$lastChar\n";
+            String encodedBody = JsonEncoder.withIndent("\x1B[35m  ").convert(postData);
+            var lines = encodedBody.split("\n").toList();
+            for (var i = 0; i < lines.length; i++) {
+              sbuf.write(lines[i]);
+              sbuf.write("\x1B[0m");
+              sbuf.writeln("");
+            }
+
+            if (sbuf.length > 0) {
+              String s = sbuf.toString().trim();
+              debugPrint("deb: [$s]");
+              var lastChar = s[s.length - 5];
+              sbuf.clear();
+              sbuf.write(s.substring(0, s.length - 5));
+              sbuf.write("\x1B[35m$lastChar");
+              sbuf.write("\x1B[0m");
             }
           } catch (_) {
-            t += postData.toString();
+            sbuf.write(postData.toString());
           }
-          buf.write(t);
+          sbuf.write("\x1B[0m");
+          buf.writeln(sbuf);
         }
         /* POST MULTIPART */
         if (multipartFiles != null && multipartFiles.isNotEmpty) {
@@ -497,48 +542,63 @@ abstract class FxNetwork<T> {
         }
         /* BODY */
         final body = (res?.body ?? '');
-        if ((res != null && res.statusCode != 200) || (debug ?? false) || logShowFull) {
-          String t = "\x1B[33m";
+        if ((res != null && res.statusCode != 200) || (debug == true) || logShowFull) {
+          sbuf.clear();
+          sbuf.write("\x1B[33m");
           try {
             if (body.isNotEmpty) {
               final decoded = jsonDecode(body);
               String encodedBody = JsonEncoder.withIndent("\x1B[33m  ").convert(decoded);
-              var lines = encodedBody.split("\n").toList();
-              if (logTruncateAt != 0 && lines.length > logTruncateAt && (debug ?? false) == false) {
-                var n = lines.length > logTruncateAt ? logTruncateAt : lines.length;
-                for (var i = 0; i < n; i++) {
-                  t += "${lines[i]}\n";
-                }
-                t += "\x1B[41m\x1B[37m*** Truncated ***";
-              } else {
-                t += encodedBody;
+              var lines = encodedBody.split("\n").toList(growable: false);
+
+              int n = lines.length;
+              if (logTruncateAt > 0 && lines.length > logTruncateAt && (debug ?? false) == false) {
+                n = logTruncateAt;
               }
 
-              if (t.length > 1) {
-                var lastChar = t[t.length - 1];
-                t = t.substring(0, t.length - 1);
-                t += "\x1B[33m$lastChar\n";
+              for (var i = 0; i < n; i++) {
+                sbuf.write(lines[i]);
+                sbuf.writeln("\x1B[0m");
               }
+              if (lines.length > logTruncateAt) {
+                sbuf.write("\x1B[41m\x1B[37m*** Truncated ***");
+                sbuf.write("\x1B[0m");
+                sbuf.write("\x1B[0m");
+              }
+
+              if (sbuf.length > 1) {
+                String s = sbuf.toString();
+                sbuf.clear();
+                var lastChar = s[s.length - 6];
+                sbuf.write(s.substring(0, s.length - 6));
+                sbuf.write("\x1B[33m$lastChar");
+                sbuf.writeln("\x1B[0m");
+              }
+              sbuf.writeln("\x1B[0m");
             }
           } catch (e, st) {
-            buf.writeln(body);
+            sbuf.write(body);
             log('Error in FxNetwork (body pretty): $e\n$st');
           }
-          buf.write(t);
+          buf.write(sbuf);
         }
       } catch (e, st) {
         buf.writeln('Log formatting error: $e\n$st');
       } finally {
         try {
-          if (kDebugMode == false) {
-            /* 
-              Force logging when on production.
+          if (logInRelease) {
+            /*
+              Force logging on PRODUCTION or RELEASE.
               log() is omitted on production by default
             */
             // ignore: avoid_print
-            print(buf);
+            debugPrint(buf.toString());
           } else {
-            log("$buf", name: "\b");
+            // another layer to omit logging on production
+            if (kDebugMode) {
+              // visible on debug console but not in logcat
+              log("$buf", name: "\b");
+            }
           }
         } catch (e, st) {
           log('Error in FxNetwork (final logging): $e\n$st');
