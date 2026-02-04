@@ -98,10 +98,10 @@ class PickerHelper {
   }
 
   /// Opens a **file picker** dialog to select a document.
-  static Future<File?> pickFile(BuildContext context) async {
+  static Future<File?> pickFile(BuildContext context, {List<String>? allowedExtensions}) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx"],
+      allowedExtensions: allowedExtensions ?? ["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx"],
     );
     if (result != null) {
       return File(result.files.first.path ?? "");
