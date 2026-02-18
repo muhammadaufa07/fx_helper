@@ -469,7 +469,7 @@ abstract class FxNetwork<T> {
 
         buf.write(res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31m");
         buf.write("[ ${res?.statusCode.toString()} | ${res?.request?.method} ]  ");
-        buf.writeln("\x1B[0m");
+        buf.write("\x1B[0m");
 
         if (logShowFull) {
           buf.writeln(_logMessage(res));
