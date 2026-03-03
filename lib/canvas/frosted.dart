@@ -1,34 +1,5 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-
-// class Frosted extends StatefulWidget {
-
-//   const Frosted({super.key, });
-
-//   @override
-//   _FrostedState createState() => _FrostedState();
-// }
-
-// class _FrostedState extends State<Frosted> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return ClipRRect(
-//       borderRadius: widget.borderRadius ?? BorderRadius.zero,
-//       clipBehavior: Clip.antiAlias,
-//       /*  */
-//       child: BackdropFilter(
-//         /*  */
-//         filter: ImageFilter.blur(
-//           /*  */
-//           sigmaX: 1.0,
-//           sigmaY: 1.0,
-//         ),
-//         child: widget.child,
-//       ),
-//     );
-//   }
-// }
 
 class Frosted extends StatelessWidget {
   final Widget child;
@@ -68,11 +39,6 @@ class Frosted extends StatelessWidget {
           decoration: BoxDecoration(
             /*  */
             borderRadius: borderRadius,
-            // border: const GradientBoxBorder(
-            //   /*  */
-            //   gradient: LinearGradient(colors: [Colors.blue, Colors.red]),
-            //   width: 4,
-            // ),
             gradient: LinearGradient(
               /*  */
               begin: Alignment.topLeft,

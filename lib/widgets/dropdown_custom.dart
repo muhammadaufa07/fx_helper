@@ -37,7 +37,6 @@ class DropdownCustom<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     Color lightGreyColor = Theme.of(context).inputDecorationTheme.disabledBorder?.borderSide.color ?? Colors.grey;
     Color greyColor = Theme.of(context).inputDecorationTheme.disabledBorder?.borderSide.color ?? Colors.grey;
-    double roundedEdge = 10.0;
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(

@@ -30,7 +30,53 @@ class StorageHelper {
       final dir = await getTemporaryDirectory();
       List<FileSystemEntity> files = await dir.list().toList();
       for (FileSystemEntity e in files) {
-        print("CACHE: ${e.path}");
+        print("CacheData: ${e.path}");
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  static Future<void> printAllAppData() async {
+    try {
+      final dir = await getApplicationSupportDirectory();
+      List<FileSystemEntity> files = await dir.list(recursive: true, followLinks: false).toList();
+      for (FileSystemEntity e in files) {
+        print("AppSupportData: ${e.path}");
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  static Future<void> deleteAllAppSupportData() async {
+    try {
+      final dir = await getApplicationSupportDirectory();
+      List<FileSystemEntity> files = await dir.list(recursive: true, followLinks: false).toList();
+      for (FileSystemEntity e in files) {
+        try {
+          print("DELETE: AppSupportData: ${e.path}");
+          e.deleteSync();
+        } catch (e) {
+          print(e);
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  static Future<void> deleteAllCacheData() async {
+    try {
+      final dir = await getApplicationSupportDirectory();
+      List<FileSystemEntity> files = await dir.list(recursive: true, followLinks: false).toList();
+      for (FileSystemEntity e in files) {
+        try {
+          print("DELETE: CacheData: ${e.path}");
+          e.deleteSync();
+        } catch (e) {
+          print(e);
+        }
       }
     } catch (e) {
       print(e.toString());
