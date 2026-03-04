@@ -1,85 +1,62 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
 class StorageHelper {
-  /// get directory or create directory if not exist
-  ///
-  ///
-  /// /root/[subDirectory]
-  static Future<String> getTempDir(String subDirectory) async {
-    Directory? tmpDir;
-    try {
-      Directory rootTmpDir = await getTemporaryDirectory();
-      tmpDir = Directory("${rootTmpDir.path}/FxHelper/$subDirectory");
-      print(tmpDir);
-      if (!tmpDir.existsSync()) {
-        print("Target dir not exist");
-        tmpDir.createSync(recursive: true);
-        print("${tmpDir.path} created!");
-      }
-    } catch (e) {
-      print(e.toString());
+  static Future<Directory> getTempDir(String? subDirectory) async {
+    Directory rootTmpDir = await getApplicationSupportDirectory();
+    Directory tmpDir = Directory("${rootTmpDir.path}${subDirectory ?? ""}");
+    if (!tmpDir.existsSync()) {
+      log("Target dir not exist");
+      tmpDir.createSync(recursive: true);
+      log("${tmpDir.path} created!");
     }
-
-    return tmpDir?.path ?? "";
+    return tmpDir;
   }
 
-  static Future<void> printAllCache() async {
+  static Future<File> createTempFromFile(File file, {String? subpath}) async {
+    Directory d = await getTempDir(subpath);
+    String name = "${DateTime.now().millisecondsSinceEpoch}";
+    String ext = ".${file.path.split('.').last}";
+    return file.copy("${d.path}/$name$ext");
+  }
+
+  static Future<void> printAllCache({String? path}) async {
+    var rootPath = (await StorageHelper.getTempDir(path)).path;
+    _printAllCache(path: rootPath);
+  }
+
+  static Future<void> _printAllCache({String? path}) async {
     try {
-      final dir = await getTemporaryDirectory();
+      Directory dir = Directory(path ?? "");
       List<FileSystemEntity> files = await dir.list().toList();
       for (FileSystemEntity e in files) {
-        print("CacheData: ${e.path}");
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  static Future<void> printAllAppData() async {
-    try {
-      final dir = await getApplicationSupportDirectory();
-      List<FileSystemEntity> files = await dir.list(recursive: true, followLinks: false).toList();
-      for (FileSystemEntity e in files) {
-        print("AppSupportData: ${e.path}");
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  static Future<void> deleteAllAppSupportData() async {
-    try {
-      final dir = await getApplicationSupportDirectory();
-      List<FileSystemEntity> files = await dir.list(recursive: true, followLinks: false).toList();
-      for (FileSystemEntity e in files) {
-        try {
-          print("DELETE: AppSupportData: ${e.path}");
-          e.deleteSync();
-        } catch (e) {
-          print(e);
+        if (e.statSync().type == FileSystemEntityType.directory) {
+          await _printAllCache(path: e.path);
+        } else {
+          log("[cache] ${e.path}");
         }
       }
     } catch (e) {
-      print(e.toString());
+      log(e.toString());
     }
   }
 
-  static Future<void> deleteAllCacheData() async {
+  static Future<void> deleteAllAppSupportData({String? path}) async {
     try {
-      final dir = await getApplicationSupportDirectory();
-      List<FileSystemEntity> files = await dir.list(recursive: true, followLinks: false).toList();
+      Directory dir = await getTempDir(path);
+      List<FileSystemEntity> files = await dir.list(recursive: false, followLinks: false).toList();
       for (FileSystemEntity e in files) {
         try {
-          print("DELETE: CacheData: ${e.path}");
-          e.deleteSync();
+          log("[delete] ${e.path}");
+          e.deleteSync(recursive: true);
         } catch (e) {
-          print(e);
+          log(e.toString());
         }
       }
     } catch (e) {
-      print(e.toString());
+      log(e.toString());
     }
   }
 
@@ -91,7 +68,7 @@ class StorageHelper {
       var dir = await getApplicationDocumentsDirectory();
       path = dir.path;
     }
-    print("DOWNLOAD DIR: $path");
+    log("DOWNLOAD DIR: $path");
     return path;
   }
 }

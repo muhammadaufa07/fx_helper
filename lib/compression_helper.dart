@@ -54,7 +54,7 @@ class CompressionHelper {
   /// ```
   static Future<void> cleanCache() async {
     try {
-      final dir = Directory(await StorageHelper.getTempDir("compression"));
+      final dir = await StorageHelper.getTempDir("/compression");
       List<FileSystemEntity> files = await dir.list().toList();
       for (FileSystemEntity e in files) {
         print("DELETED CACHE: ${e.path}");
