@@ -99,10 +99,11 @@ class PickerHelper {
 
   /// Opens a **file picker** dialog to select a document.
   static Future<File?> pickFile(BuildContext context, {List<String>? allowedExtensions}) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: allowedExtensions ?? ["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx"],
     );
+
     if (result != null) {
       return File(result.files.first.path ?? "");
     } else {
@@ -113,7 +114,7 @@ class PickerHelper {
 
   /// Opens an **image picker** dialog to select an image file from the device storage.
   static Future<File?> pickImage(BuildContext context) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+    FilePickerResult? result = await FilePicker.pickFiles(type: FileType.image);
     if (result != null) {
       return File(result.files.first.path ?? "");
     } else {
