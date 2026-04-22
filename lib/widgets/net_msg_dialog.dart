@@ -59,10 +59,19 @@ class NetMsgDialog {
         builder: (BuildContext dContext) => AlertDialog(
           key: _networkDialogGlobalKey,
           backgroundColor: Colors.white,
-          title: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: textStyleMediumBig(dContext).copyWith(color: Colors.black, fontWeight: FontWeight.bold),
+          title: Column(
+            children: [
+              Text(
+                "Terjadi Kesalahan",
+                textAlign: TextAlign.center,
+                style: textStyleMediumBig(dContext).copyWith(color: Colors.black, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: textStyleSmall(dContext).copyWith(color: Colors.black),
+              ),
+            ],
           ),
           content: Text(
             msg,
