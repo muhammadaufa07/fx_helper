@@ -478,6 +478,9 @@ abstract class FxNetwork<T> {
         } else {
           buf.write(_logUrl(res, fullPath));
           buf.write(_logMessage(res));
+          if (postData != null) {
+            buf.writeln();
+          }
         }
 
         /* HEADER */
@@ -509,7 +512,6 @@ abstract class FxNetwork<T> {
 
             if (sbuf.length > 0) {
               String s = sbuf.toString().trim();
-              debugPrint("deb: [$s]");
               var lastChar = s[s.length - 5];
               sbuf.clear();
               sbuf.write(s.substring(0, s.length - 5));
@@ -543,7 +545,6 @@ abstract class FxNetwork<T> {
         final body = (res?.body ?? '');
         if ((res != null && res.statusCode != 200) || (debug == true) || logShowFull) {
           sbuf.clear();
-          sbuf.writeln();
           sbuf.write("\x1B[33m");
           try {
             if (body.isNotEmpty) {
