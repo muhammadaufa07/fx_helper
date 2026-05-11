@@ -14,8 +14,6 @@ class NetMsgDialog {
   static void handleError(BuildContext context, e, http.Response? res) async {
     // print(e);
     // print(res);
-    print("_networkDialogGlobalKey.currentWidget");
-    print(_networkDialogGlobalKey.currentWidget);
     if (widgetInView || _networkDialogGlobalKey.currentWidget != null) return;
 
     String title = "Error";

@@ -458,14 +458,15 @@ abstract class FxNetwork<T> {
     bool? debug,
     Map<String, String>? headers,
   }) {
-    // print("\x1B[0m");
-
     if (logEnable && debug != false) {
       final buf = StringBuffer();
       final sbuf = StringBuffer();
       try {
         /* STATUS CODE */
         if (logShowFull) buf.writeln();
+        if (logShowFull) {
+          buf.write("\x1B[37m=== === === === === === === === === === === === === === === === ===\x1B[0m\n");
+        }
 
         buf.write(res?.statusCode == 200 ? "\x1B[32m" : "\x1B[31m");
         buf.write("[ ${res?.statusCode.toString()} | ${res?.request?.method} ]  ");
@@ -473,13 +474,11 @@ abstract class FxNetwork<T> {
 
         if (logShowFull) {
           buf.writeln(_logMessage(res));
-          buf.write(_logUrl(res, fullPath));
+          buf.writeln(_logUrl(res, fullPath));
         } else {
           buf.write(_logUrl(res, fullPath));
           buf.write(_logMessage(res));
         }
-
-        buf.writeln();
 
         /* HEADER */
         if (headers != null && ((debug == true) || logShowFull)) {
@@ -574,7 +573,7 @@ abstract class FxNetwork<T> {
                 sbuf.write("\x1B[33m$lastChar");
                 sbuf.writeln("\x1B[0m");
               }
-              sbuf.writeln("\x1B[0m");
+              sbuf.write("\x1B[0m");
             }
           } catch (e, st) {
             sbuf.write(body);
