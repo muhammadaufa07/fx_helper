@@ -30,7 +30,9 @@ class ImageNetworkApi extends StatelessWidget {
   Widget build(BuildContext context) {
     if (noCache && url != null && url?.isNotEmpty == true) {
       CachedNetworkImage.evictFromCache(url!);
-      print("Remove-cache: $url");
+      if (kDebugMode) {
+        print("Remove-cache: $url");
+      }
     }
 
     if (url == null || url?.isEmpty == true) {
