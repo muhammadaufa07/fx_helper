@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -66,6 +67,16 @@ class ImageNetworkApi extends StatelessWidget {
           (context, url, error) {
             return _noImageIcon();
           },
+      errorListener: (value) {
+        try {
+          if (kDebugMode) {
+            print("\x1B[31mImage: $url \x1B[0m|\x1B[31m ${value.toString().replaceFirst(url ?? "", "~")} \x1B[0m");
+          }
+        } catch (e) {
+          // do nothing
+        }
+        // print(value);
+      },
     );
   }
 
