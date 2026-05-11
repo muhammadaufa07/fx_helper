@@ -543,6 +543,7 @@ abstract class FxNetwork<T> {
         final body = (res?.body ?? '');
         if ((res != null && res.statusCode != 200) || (debug == true) || logShowFull) {
           sbuf.clear();
+          sbuf.writeln();
           sbuf.write("\x1B[33m");
           try {
             if (body.isNotEmpty) {
