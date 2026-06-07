@@ -13,6 +13,7 @@ class ImageNetworkApi extends StatelessWidget {
   final Widget Function(BuildContext, String, Object?)? errorBuilder;
   final Widget Function(BuildContext context, String url)? loadingBuilder;
   final bool noCache;
+
   const ImageNetworkApi(
     this.url, {
     super.key,
@@ -28,56 +29,50 @@ class ImageNetworkApi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (noCache && url != null && url?.isNotEmpty == true) {
+    if (noCache && url?.isNotEmpty == true) {
       CachedNetworkImage.evictFromCache(url!);
+
       if (kDebugMode) {
         print("Remove-cache: $url");
       }
     }
 
-    if (url == null || url?.isEmpty == true) {
+    if (url?.isEmpty ?? true) {
       return _noImageIcon();
     }
 
     return CachedNetworkImage(
       cacheKey: url,
-      imageUrl: url ?? "",
-      placeholderFadeInDuration: Duration(milliseconds: 1000),
-      fadeInDuration: Duration(milliseconds: 1000),
-      fadeInCurve: Curves.fastEaseInToSlowEaseOut,
+      imageUrl: url!,
       width: width,
       height: height,
+      httpHeaders: headers,
+      placeholderFadeInDuration: const Duration(milliseconds: 1000),
+      fadeInDuration: const Duration(milliseconds: 1000),
+      fadeInCurve: Curves.fastEaseInToSlowEaseOut,
+
       placeholder:
           loadingBuilder ??
           (context, url) {
-            /// show shimmer when image not ready
-            return _shimmer(width ?? 0, width ?? 0);
+            return _shimmer(width ?? 100, height ?? 100);
           },
-      httpHeaders: headers,
+
       imageBuilder: (context, imageProvider) {
-        return Container(
-          height: height ?? MediaQuery.sizeOf(context).height,
-          decoration: BoxDecoration(
-            image: DecorationImage(image: imageProvider, fit: fit ?? BoxFit.cover),
-          ),
-        );
+        return Image(image: imageProvider, width: width, height: height, fit: fit);
       },
 
-      /// show no image icon when error
       errorWidget:
           errorBuilder ??
           (context, url, error) {
             return _noImageIcon();
           },
+
       errorListener: (value) {
         try {
           if (kDebugMode) {
             print("\x1B[31mImage: $url \x1B[0m|\x1B[31m ${value.toString().replaceFirst(url ?? "", "~")} \x1B[0m");
           }
-        } catch (e) {
-          // do nothing
-        }
-        // print(value);
+        } catch (_) {}
       },
     );
   }
@@ -86,7 +81,7 @@ class ImageNetworkApi extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade400,
       highlightColor: Colors.grey.shade200,
-      child: Container(color: Colors.white, height: width, width: height),
+      child: Container(width: width, height: height, color: Colors.white),
     );
   }
 

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fx_helper/network/fx_network.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /* 
     On Staging:
@@ -12,18 +13,35 @@ import 'package:google_fonts/google_fonts.dart';
     Usage: 
       > Wrap it to a page just like a Scaffold widget.
 */
-class DevInfoWrapper extends StatelessWidget {
+
+class DevInfoWrapper extends StatefulWidget {
   final Widget child;
   final bool isDevMode;
   const DevInfoWrapper({super.key, required this.child, required this.isDevMode});
 
   @override
+  _DevInfoWrapperState createState() => _DevInfoWrapperState();
+}
+
+class _DevInfoWrapperState extends State<DevInfoWrapper> {
+  PackageInfo? _packageInfo;
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _packageInfo = await PackageInfo.fromPlatform();
+      setState(() {});
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isDevMode) {
+    if (widget.isDevMode) {
       return Stack(
         fit: StackFit.passthrough,
         children: [
-          child,
+          widget.child,
           Positioned(
             top: Platform.isAndroid ? 8 : 3,
             left: Platform.isAndroid
@@ -53,7 +71,7 @@ class DevInfoWrapper extends StatelessWidget {
                   ),
                   SizedBox(width: 4),
                   Text(
-                    "Dev v${FxNetwork.packageInfo?.version}+${FxNetwork.packageInfo?.buildNumber}",
+                    "Dev v${_packageInfo?.version}+${_packageInfo?.buildNumber}",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.bold,
@@ -69,6 +87,6 @@ class DevInfoWrapper extends StatelessWidget {
         ],
       );
     }
-    return child;
+    return widget.child;
   }
 }

@@ -10,18 +10,18 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 abstract class FxNetwork<T> {
   final http.Client httpClient;
-  static PackageInfo? _packageInfo;
-  static PackageInfo? get packageInfo {
-    return _packageInfo;
-  }
+  // static PackageInfo? _packageInfo;
+  // static PackageInfo? get packageInfo {
+  //   return _packageInfo;
+  // }
 
-  Future<void> init() async {
-    try {
-      _packageInfo = await PackageInfo.fromPlatform();
-    } catch (e) {
-      log(e.toString());
-    }
-  }
+  // Future<void> init() async {
+  //   try {
+  //     _packageInfo = await PackageInfo.fromPlatform();
+  //   } catch (e) {
+  //     log(e.toString());
+  //   }
+  // }
 
   FxNetwork({http.Client? client}) : httpClient = client ?? http.Client();
 
