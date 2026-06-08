@@ -8,11 +8,14 @@ class ImageNetworkApi extends StatelessWidget {
   final BoxFit? fit;
   final double? width;
   final double? height;
-  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final Clip? clipBehavior;
   final Map<String, String>? headers;
   final Widget Function(BuildContext, String, Object?)? errorBuilder;
   final Widget Function(BuildContext context, String url)? loadingBuilder;
+  final Color? backgroundColor;
   final bool noCache;
+  final bool isLoading;
 
   const ImageNetworkApi(
     this.url, {
@@ -20,15 +23,25 @@ class ImageNetworkApi extends StatelessWidget {
     this.fit,
     this.width,
     this.height,
-    this.backgroundColor,
+    this.borderRadius,
+    this.clipBehavior,
     this.headers,
     this.errorBuilder,
     this.loadingBuilder,
     this.noCache = false,
+    this.isLoading = false,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cBehavior = borderRadius == null ? Clip.none : (clipBehavior ?? Clip.hardEdge);
+
+    final shimmerSize = MediaQuery.sizeOf(context).shortestSide;
+
+    final shimmerWidth = width ?? shimmerSize;
+    final shimmerHeight = height ?? shimmerSize;
+
     if (noCache && url?.isNotEmpty == true) {
       CachedNetworkImage.evictFromCache(url!);
 
@@ -38,14 +51,16 @@ class ImageNetworkApi extends StatelessWidget {
     }
 
     if (url?.isEmpty ?? true) {
-      return _noImageIcon();
+      return _noImageIcon(cBehavior);
+    }
+
+    if (isLoading) {
+      return _shimmer(shimmerWidth, shimmerHeight, cBehavior);
     }
 
     return CachedNetworkImage(
       cacheKey: url,
       imageUrl: url!,
-      width: width,
-      height: height,
       httpHeaders: headers,
       placeholderFadeInDuration: const Duration(milliseconds: 1000),
       fadeInDuration: const Duration(milliseconds: 1000),
@@ -54,17 +69,24 @@ class ImageNetworkApi extends StatelessWidget {
       placeholder:
           loadingBuilder ??
           (context, url) {
-            return _shimmer(width ?? 100, height ?? 100);
+            return _shimmer(shimmerWidth, shimmerHeight, cBehavior);
           },
 
       imageBuilder: (context, imageProvider) {
-        return Image(image: imageProvider, width: width, height: height, fit: fit);
+        return ClipRRect(
+          borderRadius: borderRadius ?? BorderRadius.zero,
+          clipBehavior: cBehavior,
+          child: Container(
+            decoration: BoxDecoration(color: backgroundColor),
+            child: Image(image: imageProvider, width: width, height: height, fit: fit),
+          ),
+        );
       },
 
       errorWidget:
           errorBuilder ??
           (context, url, error) {
-            return _noImageIcon();
+            return _noImageIcon(cBehavior);
           },
 
       errorListener: (value) {
@@ -77,19 +99,28 @@ class ImageNetworkApi extends StatelessWidget {
     );
   }
 
-  Widget _shimmer(double width, double height) {
+  Widget _shimmer(double width, double height, Clip cBehavior) {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade400,
       highlightColor: Colors.grey.shade200,
-      child: Container(width: width, height: height, color: Colors.white),
+      child: Container(
+        clipBehavior: cBehavior,
+        width: width,
+        height: height,
+        decoration: BoxDecoration(color: Colors.white, borderRadius: borderRadius ?? BorderRadius.zero),
+      ),
     );
   }
 
-  Widget _noImageIcon() {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Image.asset("assets/images/img_no_image.png", fit: BoxFit.cover, package: 'fx_helper'),
+  Widget _noImageIcon(Clip cBehavior) {
+    return ClipRRect(
+      borderRadius: borderRadius ?? BorderRadius.zero,
+      clipBehavior: cBehavior,
+      child: SizedBox(
+        width: width,
+        height: height,
+        child: Image.asset("assets/images/img_no_image.png", fit: BoxFit.cover, package: 'fx_helper'),
+      ),
     );
   }
 }
