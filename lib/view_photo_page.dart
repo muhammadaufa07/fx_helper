@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+
+enum ViewImageType { asset, network, file }
 
 class ViewImagePage extends StatelessWidget {
   final String? photoUrl;
@@ -8,6 +11,7 @@ class ViewImagePage extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final FloatingActionButton? fab;
   final bool hideDefaultFab;
+  final ViewImageType type;
   const ViewImagePage({
     super.key,
     required this.photoUrl,
@@ -15,6 +19,7 @@ class ViewImagePage extends StatelessWidget {
     this.appBar,
     this.fab,
     this.hideDefaultFab = false,
+    this.type = ViewImageType.network,
   });
 
   @override
@@ -22,11 +27,37 @@ class ViewImagePage extends StatelessWidget {
     if (photoUrl == null || photoUrl?.isEmpty == true) {
       return _noImageIcon(context);
     }
-    var uri = Uri.tryParse(photoUrl ?? "");
-    Map<String, dynamic> q = {};
-    q.addAll(uri?.queryParameters ?? {});
-    q.addAll({"local_id": "${Random().nextDouble() * pi}"});
-    var url = uri?.replace(queryParameters: q);
+    // var uri = Uri.tryParse(photoUrl ?? "");
+    // Map<String, dynamic> q = {};
+    // q.addAll(uri?.queryParameters ?? {});
+    // q.addAll({"local_id": "${Random().nextDouble() * pi}"});
+    // var url = uri?.replace(queryParameters: q);
+
+    ImageProvider imageProvider;
+
+    switch (type) {
+      case ViewImageType.asset:
+        imageProvider = AssetImage(photoUrl!);
+        break;
+
+      case ViewImageType.file:
+        imageProvider = FileImage(File(photoUrl!));
+        break;
+
+      case ViewImageType.network:
+        final uri = Uri.tryParse(photoUrl!);
+
+        if (uri != null) {
+          final queryParams = <String, String>{...uri.queryParameters, 'local_id': '${Random().nextDouble() * pi}'};
+
+          final url = uri.replace(queryParameters: queryParams);
+
+          imageProvider = NetworkImage(url.toString(), headers: headers);
+        } else {
+          imageProvider = NetworkImage(photoUrl!, headers: headers);
+        }
+        break;
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -36,7 +67,7 @@ class ViewImagePage extends StatelessWidget {
       body: SafeArea(
         top: false,
         child: PhotoView(
-          imageProvider: NetworkImage(url.toString(), headers: headers),
+          imageProvider: imageProvider,
           loadingBuilder: (context, event) => const Center(child: CircularProgressIndicator(color: Colors.white)),
           errorBuilder: (context, error, stackTrace) => Center(
             child: const Text(
