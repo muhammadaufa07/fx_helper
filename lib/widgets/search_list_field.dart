@@ -6,17 +6,69 @@ import 'package:fx_helper/widgets/fx_theme.dart';
 ///
 /// [T] is a generic type, so this widget can be used with
 /// String, custom models, or any other object type.
+/// A searchable dropdown widget.
+///
+/// Supports any type `T`.
+///
+/// Example with String:
+/// ```dart
+/// SearchListField<String>(
+///   value: selectedCountry,
+///   items: countries,
+///   itemToString: (country) => country,
+///   hint: 'Select country',
+///   onChanged: (value) {
+///     setState(() => selectedCountry = value);
+///   },
+/// )
+/// ```
+///
+/// Example with custom model:
+/// ```dart
+/// SearchListField<User>(
+///   value: selectedUser,
+///   items: users,
+///   itemToString: (user) => user.name,
+///   hint: 'Select user',
+///   onChanged: (user) {
+///     setState(() => selectedUser = user);
+///   },
+/// )
+/// ```
 class SearchListField<T> extends StatefulWidget {
   /// Currently selected value.
   final T? value;
 
-  /// List of all available items.
+  /// List of items available in the dropdown.
+  ///
+  /// Example:
+  /// ```dart
+  /// items: const [
+  ///   'Male',
+  ///   'Female',
+  /// ]
+  /// ```
   final List<T> items;
 
   /// Callback triggered when an item is selected.
+  /// Called when an item is selected.
+  ///
+  /// Example:
+  /// ```dart
+  /// onChanged: (value) {
+  ///   setState(() {
+  ///     selectedCountry = value;
+  ///   });
+  /// }
+  /// ```
   final ValueChanged<T?> onChanged;
 
   /// Converts an item into a displayable string.
+  ///
+  /// Example:
+  /// ```dart
+  /// itemToString: (user) => user.name
+  /// ```
   final String Function(T) itemToString;
 
   /// Label shown above the text field.
