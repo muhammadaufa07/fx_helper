@@ -47,7 +47,7 @@ class ViewYoutubePlayer extends StatefulWidget {
   });
 
   @override
-  _ViewYoutubePlayerState createState() => _ViewYoutubePlayerState();
+  State<ViewYoutubePlayer> createState() => _ViewYoutubePlayerState();
 }
 
 class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
@@ -65,25 +65,18 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
     } else {
       id = widget.url ?? "";
     }
-    _ytController = YoutubePlayerController(
-      initialVideoId: id,
-      flags: YoutubePlayerFlags(
-        useHybridComposition: true, // fix glitch
-        /*  */
-        autoPlay: widget.autoPlay ?? true,
+    _ytController = YoutubePlayerController.fromVideoId(
+      videoId: id,
+      autoPlay: widget.autoPlay ?? true,
+      startSeconds: (widget.startAt ?? 0).toDouble(),
+      endSeconds: widget.endAt?.toDouble(),
+      params: YoutubePlayerParams(
         mute: widget.mute ?? true,
-        hideControls: widget.hideControls ?? true,
+        showControls: !(widget.hideControls ?? true),
         enableCaption: widget.enableCaption ?? false,
-        disableDragSeek: widget.disableDragSeek ?? true,
-        startAt: widget.startAt ?? 0,
-        forceHD: widget.forceHD ?? true,
-        hideThumbnail: widget.hideThumbnail ?? true,
-        showLiveFullscreenButton: widget.showLiveFullscreenButton ?? false,
-        loop: widget.loop ?? false,
-        isLive: widget.isLive ?? false,
-        controlsVisibleAtStart: widget.controlsVisibleAtStart ?? false,
         captionLanguage: widget.captionLanguage ?? "id",
-        endAt: widget.endAt,
+        loop: widget.loop ?? false,
+        showFullscreenButton: widget.showLiveFullscreenButton ?? false,
       ),
     );
 
@@ -98,11 +91,10 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    Color primaryColor = Theme.of(context).primaryColor;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
-        _ytController.pause();
+        _ytController.pauseVideo();
         blockPreview = true;
 
         Orientation currentOrientation = MediaQuery.orientationOf(context);
@@ -135,34 +127,18 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
               );
             }
 
-            return YoutubePlayerBuilder(
-              player: YoutubePlayer(
-                controller: _ytController,
-                showVideoProgressIndicator: true,
-                progressIndicatorColor: primaryColor,
-                progressColors: ProgressBarColors(playedColor: primaryColor, handleColor: primaryColor),
-                onReady: () {
-                  print("onReady()");
-                  // await Future.delayed(Duration(seconds: 3));
-                  // setState(() {});
-                },
-                onEnded: (metaData) {
-                  print("onEnded()");
-                  // _ytController?.dispose();
-                },
-              ),
-              builder: (context, player) {
-                if (!mounted || blockPreview) {
-                  return Center(
-                    child: Text(
-                      "Closing...",
-                      textAlign: TextAlign.start,
-                      style: textStyleSmall(context).copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  );
-                }
-                return Column(mainAxisAlignment: MainAxisAlignment.center, children: [player]);
-              },
+            if (!mounted || blockPreview) {
+              return Center(
+                child: Text(
+                  "Closing...",
+                  textAlign: TextAlign.start,
+                  style: textStyleSmall(context).copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              );
+            }
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [YoutubePlayer(controller: _ytController)],
             );
           },
         ),
@@ -172,7 +148,7 @@ class _ViewYoutubePlayerState extends State<ViewYoutubePlayer> {
 
   @override
   void dispose() {
-    _ytController.dispose();
+    _ytController.close();
     super.dispose();
   }
 }

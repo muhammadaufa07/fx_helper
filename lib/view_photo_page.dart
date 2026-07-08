@@ -27,12 +27,6 @@ class ViewImagePage extends StatelessWidget {
     if (photoUrl == null || photoUrl?.isEmpty == true) {
       return _noImageIcon(context);
     }
-    // var uri = Uri.tryParse(photoUrl ?? "");
-    // Map<String, dynamic> q = {};
-    // q.addAll(uri?.queryParameters ?? {});
-    // q.addAll({"local_id": "${Random().nextDouble() * pi}"});
-    // var url = uri?.replace(queryParameters: q);
-
     ImageProvider imageProvider;
 
     switch (type) {

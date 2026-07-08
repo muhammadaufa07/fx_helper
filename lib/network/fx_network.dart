@@ -10,18 +10,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 abstract class FxNetwork<T> {
   final http.Client httpClient;
-  // static PackageInfo? _packageInfo;
-  // static PackageInfo? get packageInfo {
-  //   return _packageInfo;
-  // }
-
-  // Future<void> init() async {
-  //   try {
-  //     _packageInfo = await PackageInfo.fromPlatform();
-  //   } catch (e) {
-  //     log(e.toString());
-  //   }
-  // }
 
   FxNetwork({http.Client? client}) : httpClient = client ?? http.Client();
 
@@ -618,8 +606,11 @@ abstract class FxNetwork<T> {
   }
 
   IOStreamedResponse _timeOutResponse({required String httpMethod, required String url, required int timeout}) {
-    final Map<String, dynamic> body = {'status': 408, 'message': 'Timeout: Could not connect to server $timeout'};
     const int statusCode = 408;
+    final Map<String, dynamic> body = {
+      'status': statusCode,
+      'message': 'Timeout: Could not connect to server $timeout',
+    };
     final Uri destination = Uri.parse(url);
     final String jsonBody = jsonEncode(body);
 
