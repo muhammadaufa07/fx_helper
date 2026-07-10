@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fx_helper/view_photo_page.dart';
 import 'package:fx_helper/widgets/fx_theme.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -17,6 +18,7 @@ class ImageNetworkApi extends StatelessWidget {
   final Color? backgroundColor;
   final bool noCache;
   final bool isLoading;
+  final bool openView;
 
   const ImageNetworkApi(
     this.url, {
@@ -32,6 +34,7 @@ class ImageNetworkApi extends StatelessWidget {
     this.noCache = false,
     this.isLoading = false,
     this.backgroundColor,
+    this.openView = false,
   });
 
   @override
@@ -59,7 +62,7 @@ class ImageNetworkApi extends StatelessWidget {
       return _shimmer(shimmerWidth, shimmerHeight, cBehavior);
     }
 
-    return CachedNetworkImage(
+    var imageWidget = CachedNetworkImage(
       cacheKey: url,
       imageUrl: url!,
       httpHeaders: headers,
@@ -98,6 +101,23 @@ class ImageNetworkApi extends StatelessWidget {
         } catch (_) {}
       },
     );
+
+    if (openView == true) {
+      return InkWell(
+        borderRadius: borderRadius ?? BorderRadius.zero,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ViewImagePage(photoUrl: url, headers: headers),
+            ),
+          );
+        },
+        child: imageWidget,
+      );
+    }
+
+    return imageWidget;
   }
 
   Widget _shimmer(double width, double height, Clip cBehavior) {
