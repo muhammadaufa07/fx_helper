@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 class NetMsgDialog {
   static bool widgetInView = false;
   static final GlobalKey _networkDialogGlobalKey = GlobalKey();
+  static Function()? onTap;
 
   static void handleError(BuildContext context, e, http.Response? res) async {
     // print(e);
@@ -97,9 +98,11 @@ class NetMsgDialog {
                 Expanded(
                   child: ElevatedButton(
                     style: ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 4))),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed:
+                        onTap ??
+                        () {
+                          Navigator.pop(context);
+                        },
                     child: Text(
                       'OK',
                       style: textStyleTiny(dContext).copyWith(color: Colors.white, fontWeight: FontWeight.normal),
