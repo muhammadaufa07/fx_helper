@@ -10,9 +10,8 @@ import 'package:http/http.dart' as http;
 class NetMsgDialog {
   static bool widgetInView = false;
   static final GlobalKey _networkDialogGlobalKey = GlobalKey();
-  static Function()? onTap;
 
-  static void handleError(BuildContext context, e, http.Response? res) async {
+  static void handleError(BuildContext context, e, http.Response? res, Function()? onTap) async {
     // print(e);
     // print(res);
     if (widgetInView || _networkDialogGlobalKey.currentWidget != null) return;
