@@ -74,35 +74,37 @@ class DropdownCustom<T> extends StatelessWidget {
 
             dropdownColor: Colors.white,
             borderRadius: contentBorderRadius ?? BorderRadius.zero,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.transparent,
-              // fillColor: Colors.transparent,
-              isDense: true,
-              contentPadding: padding ?? EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-              errorStyle: textStyleTiny(context).copyWith(color: Colors.red),
+            decoration:
+                decoration ??
+                InputDecoration(
+                  filled: true,
+                  fillColor: Colors.transparent,
+                  // fillColor: Colors.transparent,
+                  isDense: true,
+                  contentPadding: padding ?? EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                  errorStyle: textStyleTiny(context).copyWith(color: Colors.red),
 
-              border: OutlineInputBorder(
-                borderRadius: borderRadius ?? BorderRadius.zero,
-                borderSide: BorderSide(color: greyColor),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: borderRadius ?? BorderRadius.zero,
-                borderSide: BorderSide(color: lightGreyColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: borderRadius ?? BorderRadius.zero,
-                borderSide: BorderSide(color: greyColor),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: borderRadius ?? BorderRadius.zero,
-                borderSide: BorderSide(color: Colors.red),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: borderRadius ?? BorderRadius.zero,
-                borderSide: BorderSide(color: Colors.red),
-              ),
-            ),
+                  border: OutlineInputBorder(
+                    borderRadius: borderRadius ?? BorderRadius.zero,
+                    borderSide: BorderSide(color: greyColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: borderRadius ?? BorderRadius.zero,
+                    borderSide: BorderSide(color: lightGreyColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: borderRadius ?? BorderRadius.zero,
+                    borderSide: BorderSide(color: greyColor),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: borderRadius ?? BorderRadius.zero,
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: borderRadius ?? BorderRadius.zero,
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
+                ),
           ),
         ),
       ),
