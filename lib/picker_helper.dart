@@ -99,13 +99,16 @@ class PickerHelper {
 
   /// Opens a **file picker** dialog to select a document.
   static Future<File?> pickFile(BuildContext context, {List<String>? allowedExtensions}) async {
-    FilePickerResult? result = await FilePicker.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: allowedExtensions ?? ["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx"],
     );
 
-    if (result != null) {
-      return File(result.files.first.path ?? "");
+    if (result.isEmpty) {
+      final path = result.first.path;
+      if (path != null) {
+        return File(path);
+      }
     } else {
       SnackbarHelper.showSnackBar(SnackbarState.success, "Cancelled");
     }
@@ -114,9 +117,12 @@ class PickerHelper {
 
   /// Opens an **image picker** dialog to select an image file from the device storage.
   static Future<File?> pickImage(BuildContext context) async {
-    FilePickerResult? result = await FilePicker.pickFiles(type: FileType.image);
-    if (result != null) {
-      return File(result.files.first.path ?? "");
+    final result = await FilePicker.pickFiles(type: FileType.image);
+    if (result.isEmpty) {
+      final path = result.first.path;
+      if (path != null) {
+        return File(path);
+      }
     } else {
       SnackbarHelper.showSnackBar(SnackbarState.success, "Cancelled");
     }
