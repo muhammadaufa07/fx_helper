@@ -56,36 +56,9 @@ extension StringExtensions on String {
 
   /// highlight matching text. use in HtmlView
   String htmlHighlight(String term, {bool caseSensitive = false}) {
-    if (term.length == 1) {
-      try {
-        StringBuffer buf = StringBuffer();
-        String x = term.toUpperCase();
-        String y = term.toLowerCase();
-        for (int i = 0; i < length; i += 1) {
-          if (term[i] == x) {
-            buf.write("<mark>$x</mark>");
-          } else if (term[i] == y) {
-            buf.write("<mark>$y</mark>");
-          }
-        }
-        return buf.toString();
-      } catch (e) {
-        print(e.toString());
-      }
-    }
-    try {
-      List<RegExpMatch> t = RegExp(term, caseSensitive: false).allMatches(this).toList();
-      String k = this;
-      for (int i = 0; i < t.length; i += 1) {
-        var z = substring(t[i].start, t[i].end);
-        k = k.replaceRange(t[i].start + (i * 13), t[i].end + (i * 13), "<mark>$z</mark>");
-      }
-      return k;
-    } catch (e) {
-      print(e.toString());
-    }
-    // fall back to old way.
-    return replaceAll(RegExp(term, caseSensitive: caseSensitive), "<mark>$term</mark>");
+    if (term.isEmpty) return this;
+    final reg = RegExp(RegExp.escape(term), caseSensitive: caseSensitive);
+    return replaceAllMapped(reg, (match) => "<mark>${match.group(0)}</mark>");
   }
 
   void copyToClipboard() {
