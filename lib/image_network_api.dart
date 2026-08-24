@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fx_helper/shimmer_shines.dart';
+import 'package:fx_helper/snackbar_helper.dart';
 import 'package:fx_helper/view_photo_page.dart';
 import 'package:fx_helper/widgets/fx_theme.dart';
 import 'package:shimmer/shimmer.dart';
@@ -39,6 +43,21 @@ class ImageNetworkApi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // return ImageNetworkApi2(
+    //   url,
+    //   fit: fit,
+    //   width: width,
+    //   height: height,
+    //   borderRadius: borderRadius,
+    //   clipBehavior: clipBehavior,
+    //   headers: headers,
+    //   errorBuilder: errorBuilder,
+    //   loadingBuilder: loadingBuilder,
+    //   noCache: noCache,
+    //   isLoading: isLoading,
+    //   backgroundColor: backgroundColor,
+    // );
+
     final cBehavior = borderRadius == null ? Clip.none : (clipBehavior ?? Clip.hardEdge);
 
     final shimmerSize = MediaQuery.sizeOf(context).shortestSide;
@@ -198,10 +217,12 @@ class _ImageNetworkApi2State extends State<ImageNetworkApi2> {
   double _actualWidth = 0;
   double _actualheight = 0;
   String _scale = "";
+  BoxConstraints? _contraints;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _calculate());
   }
 
   @override
@@ -209,144 +230,88 @@ class _ImageNetworkApi2State extends State<ImageNetworkApi2> {
     super.dispose();
   }
 
-  Future<void> _calculate(BoxConstraints contraints) async {
+  Future<void> _calculate() async {
+    if (_contraints == null) return;
+    String info = "";
     setState(() {
-      _logicalHeight = contraints.maxHeight;
-      _logicalWidth = contraints.maxWidth;
-      _actualheight = _logicalHeight * MediaQuery.devicePixelRatioOf(context);
-      _actualWidth = _logicalWidth * MediaQuery.devicePixelRatioOf(context);
-      var w = (_actualWidth / 50).round() * 50;
-      var h = (_actualheight / 50).round() * 50;
+      try {
+        _logicalHeight = _contraints!.maxHeight;
+        if (_logicalHeight.isInfinite) {
+          _logicalHeight = MediaQuery.sizeOf(context).height;
+        }
+        info += "_logicalHeight: ${_logicalHeight.toStringAsFixed(2)}";
+        _logicalWidth = _contraints!.maxWidth;
 
-      var gcd = h.toInt().gcd(w.toInt());
-      _scale = "${w ~/ gcd}:${h ~/ gcd}";
+        if (_logicalWidth.isInfinite) {
+          _logicalWidth = MediaQuery.sizeOf(context).width;
+        }
+        info += "_logicalWidth: ${_logicalWidth.toStringAsFixed(2)}, ";
+        _actualheight = (_logicalHeight * MediaQuery.devicePixelRatioOf(context)).truncateToDouble();
+        _actualWidth = (_logicalWidth * MediaQuery.devicePixelRatioOf(context)).truncateToDouble();
+        info += "_actualheight: $_actualheight, ";
+        info += "_actualWidth: $_actualWidth, ";
+        var divisor = 100;
+        info += "divisor:$divisor, ";
+        var w = (_actualWidth / divisor).round() * divisor;
+        var h = (_actualheight / divisor).round() * divisor;
+        info += "w:$w, ";
+        info += "h:$h, ";
+        var gcd = h.toInt().gcd(w.toInt());
+        info += "gcd:$gcd, ";
+        _scale = "${w ~/ gcd}:${h ~/ gcd}";
+        info += "_scale:$_scale, ";
+      } catch (e) {
+        print(e.toString());
+      }
+      print(info);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final cBehavior = widget.borderRadius == null ? Clip.none : (widget.clipBehavior ?? Clip.hardEdge);
-
-    final shimmerSize = MediaQuery.sizeOf(context).shortestSide;
-
-    final shimmerWidth = widget.width ?? shimmerSize;
-    final shimmerHeight = widget.height ?? shimmerSize;
-
-    if (widget.noCache && widget.url?.isNotEmpty == true) {
-      CachedNetworkImage.evictFromCache(widget.url!);
-
-      if (kDebugMode) {
-        print("Remove-cache: ${widget.url}");
-      }
-    }
-
-    if (widget.url?.isEmpty ?? true) {
-      return _noImageIcon(cBehavior);
-    }
-
-    if (widget.isLoading) {
-      return _shimmer(shimmerWidth, shimmerHeight, cBehavior);
-    }
-
-    return CachedNetworkImage(
-      cacheKey: widget.url,
-      imageUrl: widget.url!,
-      httpHeaders: widget.headers,
-      placeholderFadeInDuration: const Duration(milliseconds: 1000),
-      fadeInDuration: const Duration(milliseconds: 1000),
-      fadeInCurve: Curves.fastEaseInToSlowEaseOut,
-
-      placeholder:
-          widget.loadingBuilder ??
-          (context, url) {
-            return _shimmer(shimmerWidth, shimmerHeight, cBehavior);
-          },
-
-      imageBuilder: (context, imageProvider) {
-        // if (true) {
-        //   WidgetsBinding.instance.addPostFrameCallback((_) => _calculate());
-        // }
-        return ClipRRect(
-          borderRadius: widget.borderRadius ?? BorderRadius.zero,
-          clipBehavior: cBehavior,
-          child: Container(
-            decoration: BoxDecoration(color: widget.backgroundColor),
-            child: true
-                ? imageSizeWidget(context)
-                : Image(image: imageProvider, width: widget.width, height: widget.height, fit: widget.fit),
-          ),
-        );
+    String scaleT = "";
+    scaleT += "\n$_actualWidth x $_actualheight";
+    scaleT += "\n$_scale";
+    String scaleMsg = "$_actualWidth x $_actualheight $_scale";
+    return InkWell(
+      highlightColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      overlayColor: WidgetStatePropertyAll(Colors.transparent),
+      focusColor: Colors.transparent,
+      onLongPress: () {
+        SnackbarHelper.showSnackBar(SnackbarState.success, scaleMsg, duration: Duration(seconds: 5));
       },
-
-      errorWidget:
-          widget.errorBuilder ??
-          (context, url, error) {
-            return _noImageIcon(cBehavior);
-          },
-
-      errorListener: (value) {
-        try {
-          if (kDebugMode) {
-            print(
-              "\x1B[31mImage: ${widget.url} \x1B[0m|\x1B[31m ${value.toString().replaceFirst(widget.url ?? "", "~")} \x1B[0m",
-            );
-          }
-        } catch (_) {}
-      },
-    );
-  }
-
-  Widget imageSizeWidget(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, contraints) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _calculate(contraints));
-        _calculate(contraints);
-        return Container(
-          width: widget.width,
-          height: widget.height,
-          decoration: BoxDecoration(
-            /*  */
-            color: Colors.pink.shade400,
-          ),
-          child: Center(
-            child: Text(
-              "${_logicalWidth.round()}x${_logicalHeight.round()}\n$_scale",
-              style: textStyleTiny(context).copyWith(fontSize: 8, color: Colors.white),
-              textAlign: TextAlign.center,
+      child: LayoutBuilder(
+        builder: (context, contraints) {
+          _contraints = contraints;
+          return ShimmerShines(
+            isVisible: true,
+            child: Container(
+              width: widget.width,
+              height: widget.height,
+              decoration: BoxDecoration(
+                color: [
+                  const Color.fromARGB(255, 182, 136, 0),
+                  Colors.pink.shade400,
+                  Colors.red.shade400,
+                  Colors.blueAccent.shade400,
+                  Colors.orange.shade400,
+                  Colors.deepOrange.shade400,
+                  Colors.purple.shade400,
+                  Colors.teal.shade400,
+                ][Random.secure().nextInt(7)],
+              ),
+              child: Center(
+                child: Text(
+                  scaleT,
+                  style: textStyleTiny(context).copyWith(fontSize: 10, color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _shimmer(double width, double height, Clip cBehavior) {
-    if (true) {
-      return imageSizeWidget(context);
-    }
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade400,
-      highlightColor: Colors.grey.shade200,
-      child: Container(
-        clipBehavior: cBehavior,
-        width: width,
-        height: height,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: widget.borderRadius ?? BorderRadius.zero),
-      ),
-    );
-  }
-
-  Widget _noImageIcon(Clip cBehavior) {
-    if (true) {
-      return imageSizeWidget(context);
-    }
-    return ClipRRect(
-      borderRadius: widget.borderRadius ?? BorderRadius.zero,
-      clipBehavior: cBehavior,
-      child: SizedBox(
-        width: widget.width,
-        height: widget.height,
-        child: Image.asset("assets/images/img_no_image.png", fit: BoxFit.cover, package: 'fx_helper'),
+          );
+        },
       ),
     );
   }
