@@ -104,8 +104,8 @@ class PickerHelper {
       allowedExtensions: allowedExtensions ?? ["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx"],
     );
 
-    if (result.isEmpty) {
-      final path = result.first.path;
+    if (result != null && result.files.isNotEmpty) {
+      final path = result.files.first.path;
       if (path != null) {
         return File(path);
       }
@@ -118,8 +118,8 @@ class PickerHelper {
   /// Opens an **image picker** dialog to select an image file from the device storage.
   static Future<File?> pickImage(BuildContext context) async {
     final result = await FilePicker.pickFiles(type: FileType.image);
-    if (result.isEmpty) {
-      final path = result.first.path;
+    if (result != null && result.files.isNotEmpty) {
+      final path = result.files.first.path;
       if (path != null) {
         return File(path);
       }
