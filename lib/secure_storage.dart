@@ -8,9 +8,7 @@ class SecureStorage {
   SecureStorage._internal();
 
   final FlutterSecureStorage storage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true, // Gunakan EncryptedSharedPreferences di Android
-    ),
+    aOptions: AndroidOptions(), // v11: default sudah AES-GCM + RSA OAEP, setara EncryptedSharedPreferences
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device, // iOS: hanya setelah pertama unlock
     ),
